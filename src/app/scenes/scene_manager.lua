@@ -63,7 +63,7 @@ end
 function SceneManager:EnterScene(scene)
 	self.cur_scene = scene
 	StickUnits.Instance:RemoveFromScene()
-	StickUnits.Instance:AddToScene(scene)
+	StickUnits.Instance:AddToScene(scene:GetTouchLayer())
 	display.replaceScene(scene)
 end
 
@@ -89,12 +89,21 @@ function SceneManager:NoticeDead(role)
 	if not role then
 		return
 	end
+	local dead_role = self:GetRoleById(role:GetRoleId())
+	if dead_role then
+		dead_role:ToDead()
+		self.cur_scene:RemoveRoleFromTable(dead_role)
+	end
+end
+
+function SceneManager:GetRoleById(role_id)
+	if not role_id then
+	    return
+	end
 	local scene_role_table = self.cur_scene:GetRoleTable()
 	for j = 1 , #scene_role_table do
-		if scene_role_table[j]:GetRoleId() == role:GetRoleId() then
-			scene_role_table[j]:ToDead()
-			self.cur_scene:RemoveRoleFromTable(scene_role_table[j])
-			return
+		if scene_role_table[j]:GetRoleId() == role_id then
+			return scene_role_table[j]
 		end
 	end
 end
@@ -118,4 +127,11 @@ end
 
 function SceneManager:GetPlayerRoleId()
 	return self.player_role_id
+end
+
+function SceneManager:SetRolePosition(role_id,pos)
+	local role = self:GetRoleById(role_id)
+	if role then
+	    role:MoveToPosition(pos)
+	end
 end

@@ -1,6 +1,6 @@
 --[[
 Copyright:		2015, Luoheng. All rights reserved.
-File name: 		MyApp
+File name: 		main
 Description: 	游戏入口；初始化场景管理器、数据处理器；
 Author: 		Luoheng
 Email:			287429173@qq.com
@@ -23,13 +23,13 @@ require("app.roles.init")
 require("app.scenes.init")
 
 
-local MyApp = class("MyApp", cc.mvc.AppBase)
+local main = class("main", cc.mvc.AppBase)
 
-function MyApp:ctor()
-    MyApp.super.ctor(self)
+function main:ctor()
+    main.super.ctor(self)
 end
 
-function MyApp:run()
+function main:run()
 	display.addSpriteFrames("res/roles/fighter.plist", "res/roles/fighter.png");
 	display.addSpriteFrames("res/roles/soldier.plist", "res/roles/soldier.png");
 
@@ -40,12 +40,12 @@ function MyApp:run()
     display.replaceScene(GameStartScene.Instance)
 end
 
-function MyApp:ResetData()
+function main:ResetData()
 	DataProcess.Instance:ResetData()
 	SceneManager.Instance:ResetData()
 end
 
-function MyApp:exit()
+function main:exit()
 	display.removeSpriteFramesWithFile("res/roles/fighter.plist", "res/roles/fighter.png");
 	
 	DataProcess.DeleteMe()
@@ -53,7 +53,7 @@ function MyApp:exit()
 	SceneManager.Instance:ResetData()
 	SceneManager.DeleteMe()
 
-	MyApp.super.exit()
+	main.super.exit()
 end
 
-return MyApp
+return main

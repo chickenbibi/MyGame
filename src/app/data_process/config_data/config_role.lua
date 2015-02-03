@@ -41,6 +41,7 @@ config_role = {
 		float_damage = 10,
 		speed = 1,
 		role_type = PLAYER_ROLE,
+		role_offsetX = 83,
 	},
 
 	[1000] = {

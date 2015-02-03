@@ -49,6 +49,13 @@ function RoleData:GetPosition()
 	return self.attr.pos
 end
 
+function RoleData:SetPosition(pos)
+	if not pos then
+	    return
+	end
+	self.attr.pos = pos
+end
+
 function RoleData:GetAttr()
 	return self.attr
 end

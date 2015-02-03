@@ -27,10 +27,11 @@ function Fighter:AddAnimation()
 	-- 创建动作帧
     local animationNames = {"walk","attack1","attack2","hit","dead"}
     local animationFrameNum = {4, 4, 4, 3, 4}
+    local animationFrameTime = {0.2,0.1,0.1,0.1,0.1,}
  
     for i = 1, #animationNames do
         local frames = display.newFrames("fighter-" .. animationNames[i] .. "-%d.png", 1, animationFrameNum[i])
-        local animation = display.newAnimation(frames, 0.1)
+        local animation = display.newAnimation(frames, animationFrameTime[i])
         display.setAnimationCache("fighter-" .. animationNames[i], animation)
     end
 end
@@ -40,6 +41,13 @@ function Fighter:onTouch()
 		return
 	end
 	self.fsm:doEvent("attack")
+end
+
+function Fighter:DoMoveEvent()
+	if not self.fsm:isState("idle") then
+		return
+	end
+	self.fsm:doEvent("walk")
 end
 
 function Fighter:onbeforeAttack()
@@ -57,6 +65,13 @@ end
 
 function Fighter:AttackCallBack()
 	DataProcess.Instance:CastSkill(100,self:GetRoleId())
+	self:Stop()
+end
+
+function Fighter:Stop()
+	if not self.fsm:isState("walking") and not self.fsm:isState("attacking") then
+	    return
+	end
 	self.fsm:doEvent("stop")
 end
 

@@ -1,4 +1,4 @@
-PIX_RATE = 5
+PIX_RATE = 10
 
 StickUnits = StickUnits or BaseClass()
 
@@ -7,7 +7,9 @@ function StickUnits:__init()
 	    error("StickUnits must be singleton!")
 	end
 	StickUnits.Instance = self
+
 	self.round_r = 88.5
+
 	self:InitSprite()
 	self:InitEvents()
 end
@@ -16,8 +18,10 @@ function StickUnits:InitSprite()
 	self.background = display.newSprite("res/units/stick/stick_bg.png", display.left + self.round_r, display.bottom + self.round_r)
 	self.background:setAnchorPoint(cc.p(0.5, 0.5))
 	self.background:setOpacity(255)
+	self.background:setLocalZOrder(CONFIG_ZORDER_UI)
 	self.stick = display.newSprite("res/units/stick/stick.png", self.round_r, self.round_r)
 	self.stick:setAnchorPoint(cc.p(0.5, 0.5))
+	self.stick:setLocalZOrder(CONFIG_ZORDER_UI)	
 	self.background:addChild(self.stick)
 	self.background:retain()
 	self.stick:retain()
@@ -25,10 +29,54 @@ end
 
 function StickUnits:InitEvents()
 	self.background:setTouchEnabled(true)
-	self.background:setTouchSwallowEnabled(true)
+	-- self.background:setTouchSwallowEnabled(true)
 	self.background:setTouchMode(cc.TOUCH_MODE_ONE_BY_ONE)
 	self.background:addNodeEventListener(cc.NODE_TOUCH_EVENT, function(event) return true end)
-	self.background:addNodeEventListener(cc.NODE_TOUCH_CAPTURE_EVENT, function(event) self:TouchEventCallBack(event) end)
+	self.background:addNodeEventListener(cc.NODE_TOUCH_CAPTURE_EVENT, function(event)
+		if event.name == "began" then
+			print("began")
+			return true
+		end
+
+		if not self.handle then
+	    	local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
+	    	self.handle = scheduler.scheduleGlobal(function() self:TouchScheduler(self.x_,self.y_) end, 0.1)
+	    end
+	    if event.name == "moved" then
+	    	-- 设置摇杆位置
+	    	local x,y = self:GetStickPosition(event.x,event.y)
+	    	self.stick:setPosition(cc.p(self.round_r + x,self.round_r + y))
+
+	    	-- 设置移动参数
+			self.x_ = event.x
+			self.y_ = event.y
+
+			-- 播放移动动作
+			local player = SceneManager.Instance:GetRoleById(SceneManager.Instance:GetPlayerRoleId())
+			player:DoMoveEvent()
+		end
+		if event.name == "ended" then
+			print("ended")
+			-- 摇杆复原
+			self.stick:setPosition(cc.p(self.round_r, self.round_r))
+
+			if self.handle then
+		    	local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
+		    	scheduler.unscheduleGlobal(self.handle)
+		    	self.handle = nil
+		    end
+
+		    -- 停止播放动作
+		    local player = SceneManager.Instance:GetRoleById(SceneManager.Instance:GetPlayerRoleId())
+			player:Stop()
+		    return false
+		end
+		if event.name == "cancelled" then
+			print("cancelled")
+			return false
+	    end
+		return true
+	end)
 end
 
 function StickUnits:AddToScene(layer)
@@ -39,32 +87,6 @@ function StickUnits:RemoveFromScene()
 	if self.background and self.background:getParent() then
 		self.background:removeFromParent()
 	end
-end
-
-function StickUnits:TouchEventCallBack(event)
-	if event.name == "began" then
-		print("began")
-		-- local x,y = self:GetStickPosition(event.x,event.y)
-  --   	self.stick:setPosition(cc.p(self.round_r + x,self.round_r + y))
-		-- self:TouchScheduler(event.x,event.y)
-		-- transition.fadeTo(self.background, { opacity = 255, time = 1})
-    elseif event.name == "moved" then
-    	print("moved")
-    	local x,y = self:GetStickPosition(event.x,event.y)
-    	self.stick:setPosition(cc.p(x,y))
-
-    	-- local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
-    	-- self.handle = scheduler.scheduleGlobal(self:TouchScheduler(event.x,event.y), 1)
-	    return true
-
-	elseif event.name == "ended" then
-		print("ended")
-	    return false
-
-	elseif event.name == "cancelled" then
-		print("cancelled")
-		return false
-    end
 end
 
 function StickUnits:GetStickPosition(event_x,event_y)

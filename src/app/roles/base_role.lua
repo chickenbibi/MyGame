@@ -7,11 +7,10 @@ Email:			287429173@qq.com
 ]]
 BaseRole = BaseRole or BaseClass()
 
-function BaseRole:__init(attr,default)
-	self.default_args = default
+function BaseRole:__init(attr)
 	self:InitAttribute(attr)
-	self:InitBaseStateMachine(default.events,default.callbacks)
-	self:InitSprite(default.sprite_name)
+	self:InitBaseStateMachine(self.__default_arg.events,self.__default_arg.callbacks)
+	self:InitSprite(self.__default_arg.sprite_name)
 end
 
 -- 设置属性
@@ -76,7 +75,7 @@ function BaseRole:AddToScene(scene,role)
 	    error("Can't Find the sprite !!!")
 	end
 	self.sprite:setPosition(role:GetPosition())
-	self.sprite:setLocalZOrder(role:GetPosition().y)
+	self.sprite:setLocalZOrder(CONFIG_ZORDER_ROLE-role:GetPosition().y+600)
 	scene:addChild(self.sprite)
 end
 
@@ -85,6 +84,9 @@ function BaseRole:onStart()
 end
 
 function BaseRole:onbeforeWalk()
+	local str = string.split(self.__default_arg.sprite_name, "#")
+	local name = string.split(str[2], "-")
+	transition.playAnimationForever(self.sprite, display.getAnimationCache(name[1].."-walk"))
 end
 
 function BaseRole:onafterWalk()
@@ -97,7 +99,8 @@ function BaseRole:onafterAttack()
 end
 
 function BaseRole:onStop()
-	local sprite_name = string.split(self.default_args.sprite_name, "#")
+	transition.stopTarget(self.sprite)
+	local sprite_name = string.split(self.__default_arg.sprite_name, "#")
 	self.sprite:setSpriteFrame(display.newSpriteFrame(sprite_name[2]))
 end
 
@@ -123,4 +126,13 @@ function BaseRole:DecreaseHp(damage)
 end
 
 function BaseRole:ToDead()
+end
+
+function BaseRole:MoveToPosition(pos)
+	if not pos then
+	    return
+	end
+	self.attr.pos = pos
+	self.sprite:setPosition(pos)
+	self.sprite:setLocalZOrder(CONFIG_ZORDER_ROLE-pos.y+600)
 end

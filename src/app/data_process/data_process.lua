@@ -135,4 +135,10 @@ end
 function DataProcess:MoveRole(role_id,pos)
 	printf("Moving to x: %d",pos.x)
 	printf("Moving to y: %d",pos.y)
+	if not role_id or not pos then
+	    return
+	end
+	local role_info = self:GetRoleInfo(role_id)
+	role_info:SetPosition(pos)
+	SceneManager.Instance:SetRolePosition(role_id,pos)
 end
