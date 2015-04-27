@@ -1,8 +1,12 @@
-local GameStartScene = class("GameStartScene", function()
+GameStartScene = GameStartScene or class("GameStartScene", function()
     return display.newScene("GameStartScene")
 end)
 
 function GameStartScene:ctor()
+	if GameStartScene.Instance ~= nil then
+	    error("GameStartScene must be singleton!")
+	end
+	GameStartScene.Instance = self
 	cc.FileUtils:getInstance():addSearchPath("res/game_start/")
 	cc.uiloader:load("game_start.json"):addTo(self)
 
@@ -24,8 +28,10 @@ function GameStartScene:InitEvents()
 			event.target:setScale(0.6)
 		end)
 		:onButtonClicked(function(event)
-			print(">>>>>>>>")
+			self:EnterNextScene()
 		end)
 end
 
-return GameStartScene
+function GameStartScene:EnterNextScene()
+    display.replaceScene(BattleScene.Instance)
+end

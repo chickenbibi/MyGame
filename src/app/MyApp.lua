@@ -1,7 +1,10 @@
-
 require("config")
 require("cocos.init")
 require("framework.init")
+require("app.scenes.game_start_scene.game_start_scene")
+require("app.scenes.battle_scene.battle_scene")
+GameStartScene.new()
+BattleScene.new()
 
 local MyApp = class("MyApp", cc.mvc.AppBase)
 
@@ -10,8 +13,7 @@ function MyApp:ctor()
 end
 
 function MyApp:run()
-    cc.FileUtils:getInstance():addSearchPath("res/")
-    self:enterScene("scene.game_start.game_start_scene")
+    display.replaceScene(GameStartScene.Instance)
 end
 
 return MyApp
