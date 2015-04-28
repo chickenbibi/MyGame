@@ -1,10 +1,7 @@
 require("config")
 require("cocos.init")
 require("framework.init")
-require("app.scenes.game_start_scene.game_start_scene")
-require("app.scenes.battle_scene.battle_scene")
-GameStartScene.new()
-BattleScene.new()
+require("app.scenes.init")
 
 local MyApp = class("MyApp", cc.mvc.AppBase)
 
@@ -13,7 +10,13 @@ function MyApp:ctor()
 end
 
 function MyApp:run()
+	SceneManager.New()
     display.replaceScene(GameStartScene.Instance)
+end
+
+function MyApp:exit()
+	SceneManager.Instance:ResetData()
+	MyApp.super.exit()
 end
 
 return MyApp
