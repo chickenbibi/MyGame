@@ -23,11 +23,11 @@ end
 function BaseRole:InitBaseStateMachine(events,callbacks)
 	-- 基类事件
 	self.events = {
-		{name = "start",  	from = "none",    to = "idle" },
-		{name = "walk",  	from = "idle",    to = "is_walking" },
-		{name = "attack",  	from = "idle",    to = "is_attacking" },
-		{name = "stay",		from = "*",		  to = "is_staying" },
-		{name = "kill",		from = "*",		  to = "is_dead" },
+		{name = "start",  	from = "none",    						to = "idle" },
+		{name = "walk",  	from = "idle",   		 				to = "is_walking" },
+		{name = "attack",  	from = "idle",    						to = "is_attacking" },
+		{name = "kill",		from = "*",		  						to = "is_dead" },
+		{name = "backidle",		from = {"is_walking","is_attacking"},	to = "idle"},
 	}
 	-- 合并子类事件
 	table.insertto(self.events, checktable(events))
@@ -37,8 +37,8 @@ function BaseRole:InitBaseStateMachine(events,callbacks)
         onstart       	= handler(self, self.onStart),
         onwalk        	= handler(self, self.onWalk),
         onattack       	= handler(self, self.onAttack),
-        onstay      	= handler(self, self.onStay),
         onkill        	= handler(self, self.onKill),
+        onbackidle     	= handler(self, self.onbackidle),
 	}
 	-- 合并子类事件回调
 	table.insertto(self.callbacks, checktable(callbacks))
@@ -81,8 +81,9 @@ end
 function BaseRole:onAttack()
 end
 
-function BaseRole:onStay()
+function BaseRole:onKill()
 end
 
-function BaseRole:onKill()
+function BaseRole:onbackidle()
+	print("onidle !!!")
 end

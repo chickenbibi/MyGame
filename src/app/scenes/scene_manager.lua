@@ -33,7 +33,6 @@ function SceneManager:DeleteSceneFromMgr(scene)
 		if self.scene_table[index] == scene then
 		    table.remove(self.scene_table,index)
 		    scene:release()
-		    print("Scene "..index.." Delete Success !!!")
 		    return true
 		end
 	end

@@ -1,6 +1,7 @@
 require("config")
 require("cocos.init")
 require("framework.init")
+require("framework.cc.mvc.BaseClass")
 -- 数据处理类
 require("app.data_process.init")
 -- 事件定义
@@ -18,7 +19,9 @@ function MyApp:ctor()
 end
 
 function MyApp:run()
-	display.addSpriteFrames("res/roles/role.plist", "res/roles/role.pvr.ccz");
+	display.addSpriteFrames("res/roles/fighter.plist", "res/roles/fighter.png");
+
+
 	DataProcess.New()
 	SceneManager.New()
 
@@ -31,6 +34,8 @@ function MyApp:ResetData()
 end
 
 function MyApp:exit()
+	display.removeSpriteFramesWithFile("res/roles/fighter.plist", "res/roles/fighter.png");
+	
 	DataProcess.DeleteMe()
 	
 	SceneManager.Instance:ResetData()

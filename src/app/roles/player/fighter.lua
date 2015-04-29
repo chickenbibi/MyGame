@@ -1,20 +1,14 @@
 Fighter = Fighter or BaseClass(BaseRole)
 
 Fighter.__default_arg = {
-	sprite_name = "#fighter_walk-1.png",
+	sprite_name = "#fighter-walk-1.png",
 	events = {},
 	callbacks = {},
 }
 
 function Fighter:__init(attr)
-	self.attack_pattrn = 1
+	self.attack_pattrn = 3
 	self:addAnimation()
-end
-
-function Fighter:onAttack()
-	-- 当前攻击模式，1、2为轻击，3为重击
-	self.attack_pattrn = (self.attack_pattrn + 1) % 3 + 1
-	-- if
 end
 
 function Fighter:ChangeHp()
@@ -23,22 +17,32 @@ function Fighter:ChangeHp()
 end
 
 function Fighter:addAnimation()
-	cc.FileUtils:getInstance():addSearchPath("res/roles/")
 	-- 创建动作帧
     local animationNames = {"walk","attack1","attack2","hit","dead"}
-    local animationFrameNum = {4, 4, 4, 2, 4}
+    local animationFrameNum = {4, 5, 5, 3, 4}
  
     for i = 1, #animationNames do
-        local frames = display.newFrames("fighter_" .. animationNames[i] .. "-%d.png", 1, animationFrameNum[i])
-        local animation = display.newAnimation(frames, 0.2)
-        display.setAnimationCache("fighter_" .. animationNames[i], animation)
+        local frames = display.newFrames("fighter-" .. animationNames[i] .. "-%d.png", 1, animationFrameNum[i])
+        local animation = display.newAnimation(frames, 0.1)
+        display.setAnimationCache("fighter-" .. animationNames[i], animation)
     end
 end
 
 function Fighter:onTouch()
-	local attack_pattrn = 1
+	self.fsm:doEvent("attack")
+end
+
+function BaseRole:onbackidle()
+	-- transition.playAnimationOnce(self.sprite, display.getAnimationCache("fighter-idle"))
+end
+
+function Fighter:onAttack()
+	-- 当前攻击模式，1、2为轻击，3为重击
+	self.attack_pattrn = (self.attack_pattrn + 1) % 3 + 1
+	local attack_pattrn = 2
 	if self.attack_pattrn == 3 then
-	    attack_pattrn = 2
+	    attack_pattrn = 1
 	end
-	transition.playAnimationForever(self.sprite, display.getAnimationCache("fighter_attack"..attack_pattrn))
+	transition.playAnimationOnce(self.sprite, display.getAnimationCache("fighter-attack"..attack_pattrn))
+	self.fsm:doEvent("backidle")
 end

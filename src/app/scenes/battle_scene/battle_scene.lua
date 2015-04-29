@@ -37,7 +37,7 @@ function BattleScene:AddPlayer(role_id)
 	local player_attr = DataProcess.Instance:AddPlayer(role_id)
 	if player_attr then
 	    self.player = Fighter.New(player_attr)
-	    self.player:AddToScene(self,cc.p(display.left + 50, display.cy))
+	    self.player:AddToScene(self,cc.p(display.left + 200, display.cy))
 	end
 end
 
