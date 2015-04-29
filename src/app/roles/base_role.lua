@@ -1,8 +1,9 @@
 BaseRole = BaseRole or BaseClass()
 
-function BaseRole:__init(attr,events,callbacks)
+function BaseRole:__init(attr,default)
 	self:InitAttribute(attr)
-	self:InitBaseStateMachine(events,callbacks)
+	self:InitBaseStateMachine(default.events,default.callbacks)
+	self:InitSprite(default.sprite_name)
 end
 
 -- 设置属性
@@ -42,10 +43,11 @@ function BaseRole:InitBaseStateMachine(events,callbacks)
 	-- 合并子类事件回调
 	table.insertto(self.callbacks, checktable(callbacks))
 
-	-- 绑定状态机
-	self:addComponent("components.behavior.StateMachine")
-	-- 取得状态机
-	self.fsm = self:getComponent("components.behavior.StateMachine")
+	self.fsm = {}
+    cc.GameObject.extend(self.fsm)
+        :addComponent("components.behavior.StateMachine")
+        :exportMethods()
+
 	-- 启动状态机
 	self.fsm:setupState(
 		{
@@ -56,8 +58,21 @@ function BaseRole:InitBaseStateMachine(events,callbacks)
     self.fsm:doEvent("start")
 end
 
+function BaseRole:InitSprite(sprite_name)
+	cc.FileUtils:getInstance():addSearchPath("res/roles/")
+	self.sprite = display.newSprite(sprite_name)
+end
+
+function BaseRole:AddToScene(scene,pos)
+	if not self.sprite then
+	    error("Can't Find the sprite !!!")
+	end
+	self.sprite:setPosition(pos)
+	scene:addChild(self.sprite)
+end
+
 function BaseRole:onStart()
-	self:dispatchEvent({name = SCENE_EVENT.ROLE_INIT})
+	-- self.fsm:dispatchEvent({name = SCENE_EVENT.ROLE_INIT})
 end
 
 function BaseRole:onWalk()

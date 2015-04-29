@@ -8,11 +8,9 @@ attack_float	攻击浮动值
 speed 			移动速度
 ]]
 
-CONFIG_PROPERTIES = {
-	BASE_ROLE = {
-		id = 1,
+config_role = {
+	[1] = {
 		name = "基础角色",
-		level = 1,
 		base_hp = 500,
 		grow_hp = 80,
 		attack = 80,
@@ -21,8 +19,7 @@ CONFIG_PROPERTIES = {
 		speed = 1,
 	},
 
-	FIGHTER = {
-		id = 100,
+	[100] = {
 		name = "格斗家",
 		base_hp = 800,
 		grow_hp = 100,

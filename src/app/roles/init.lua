@@ -1,6 +1,5 @@
 -- 属性LOG开关
-DEBUG_ROLE_INIT = 1
+DEBUG_ROLE_INIT = 0
 -- init roles model
-import(".config.config_properties")
 import(".base_role")
 import(".player.fighter")

@@ -12,10 +12,33 @@ function BattleScene:ctor()
 
 	-- 重置场景角色表
 	self:ResetRoleSceneTable()
+	-- 添加角色
+	self:AddPlayer(100)
+	-- 添加触摸层
+	self:AddTouchLayer()
+end
+
+function BattleScene:AddTouchLayer()
+	self.layerTouch = display.newLayer()
+    self.layerTouch:addNodeEventListener(cc.NODE_TOUCH_EVENT, function(event)
+        self.player:onTouch(event.name)
+    end)
+    self.layerTouch:setTouchEnabled(true)
+    self.layerTouch:setPosition(cc.p(0,0))
+    self.layerTouch:setContentSize(cc.size(display.width, display.height))
+    self:addChild(self.layerTouch)
 end
 
 function BattleScene:ResetRoleSceneTable()
 	self.role_scene_table = {}
+end
+
+function BattleScene:AddPlayer(role_id)
+	local player_attr = DataProcess.Instance:AddPlayer(role_id)
+	if player_attr then
+	    self.player = Fighter.New(player_attr)
+	    self.player:AddToScene(self,cc.p(display.left + 50, display.cy))
+	end
 end
 
 function BattleScene:AddRoleToSceneTable(role)

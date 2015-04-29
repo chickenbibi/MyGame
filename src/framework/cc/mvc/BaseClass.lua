@@ -6,6 +6,7 @@ function BaseClass(super)
 	-- 生成一个类类型
 	local class_type = {}
 	-- 在创建对象的时候自动调用
+	class_type.__default_arg = false
 	class_type.__init = false
 	class_type.__delete = false
 	class_type.super = super
@@ -22,7 +23,11 @@ function BaseClass(super)
 			local create 
 			create = function(c, ...)
 				if c.super then
-					create(c.super, ...)
+					if c.__default_arg then
+					    create(c.super,...,c.__default_arg)
+					else
+						create(c.super, ...)
+					end
 				end
 				if c.__init then
 					c.__init(obj, ...)
