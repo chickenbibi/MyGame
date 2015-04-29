@@ -1,44 +1,33 @@
 Fighter = Fighter or BaseClass(BaseRole)
 
-function Fighter:__init()
-	-- fighter类属性
-	self:SetProperties()
+-- fighter类独有事件
+local events = {
+}
 
-	-- 设置状态机
-	self:SetUpState()
+-- fighter类独有事件回调
+local callbacks = {
+}
+
+function Fighter:__init(attr,events,callbacks)
 end
 
-function SetProperties()
-	if CONFIG_PROPERTIES.FIGHTER then
-		for key, value in pairs(CONFIG_PROPERTIES.FIGHTER) do
-			self.properties[key] = value
-			print(key)
-			print(value)
-		end
-	end
+function Fighter:onAttack()
 end
 
-function Fighter:SetUpState()
-	-- fighter类独有事件
-	local events = {
-	}
-	-- 合并fighter和基类事件
-	table.insertto(self.events, checktable(events))
-	-- fighter类独有事件回调
-	local callbacks = {
-	}
-	table.insertto(self.callbacks, checktable(callbacks))
+function Fighter:ChangeHp()
+	-- HP改变事件，需要的时候开启
+	-- self:dispatchEvent({name = SCENE_EVENT.HP_CHANGED_EVENT})
+end
 
-	-- 绑定状态机
-	self:addComponent("components.behavior.StateMachine"):exportMethods()
-	-- 取得状态机
-	self.fsm = self:getComponent("components.behavior.StateMachine")
-	-- 启动状态机
-	self.fsm:setupState(
-		{
-			events = self.events,
-          	callbacks = self.callbacks
-        }
-    )
-    self.fsm:doEvent("start")
+function Fighter:addAnimation()
+	cc.FileUtils:getInstance():addSearchPath("res/roles/")
+	-- 创建动作帧
+    local animationNames = {"walk","attack1","attack2","hit","dead"}
+    local animationFrameNum = {4, 4, 4, 2, 4}
+ 
+    for i = 1, #animationNames do
+        local frames = display.newFrames("fighter_" .. animationNames[i] .. "-%d.png", 1, animationFrameNum[i])
+        local animation = display.newAnimation(frames, 0.2)
+        display.setAnimationCache("fighter-" .. animationNames[i], animation)
+    end
 end
