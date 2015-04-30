@@ -1,3 +1,10 @@
+--[[
+Copyright:		2015, Luoheng. All rights reserved.
+File name: 		fighter
+Description: 	角色行为基类
+Author: 		Luoheng
+Email:			287429173@qq.com
+]]
 BaseRole = BaseRole or BaseClass()
 
 function BaseRole:__init(attr,default)

@@ -1,3 +1,10 @@
+--[[
+Copyright:		2015, Luoheng. All rights reserved.
+File name: 		scene_manager
+Description: 	场景管理器；所有场景的初始化均在此进行，注意接口的保持
+Author: 		Luoheng
+Email:			287429173@qq.com
+]]
 SceneManager = SceneManager or BaseClass()
 
 function SceneManager:__init()

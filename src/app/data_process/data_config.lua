@@ -1,4 +1,13 @@
 --[[
+Copyright:		2015, Luoheng. All rights reserved.
+File name: 		data_config
+Description: 	数据定义
+Author: 		Luoheng
+Email:			287429173@qq.com
+]]
+
+
+--[[
 id 				角色种类
 base_hp 		基础血量
 grow_hp			成长血量

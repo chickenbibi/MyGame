@@ -1,3 +1,12 @@
+--[[
+Copyright:		2015, Luoheng. All rights reserved.
+File name: 		fighter
+Description: 	战士行为类
+Author: 		Luoheng
+Email:			287429173@qq.com
+Version: 		beta-0.5
+Date: 			4-30-2015
+]]
 require("config")
 require("cocos.init")
 require("framework.init")
