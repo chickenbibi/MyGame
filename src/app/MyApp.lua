@@ -1,7 +1,7 @@
 --[[
 Copyright:		2015, Luoheng. All rights reserved.
-File name: 		fighter
-Description: 	战士行为类
+File name: 		MyApp
+Description: 	游戏入口；初始化场景管理器、数据处理器；
 Author: 		Luoheng
 Email:			287429173@qq.com
 Version: 		beta-0.5
