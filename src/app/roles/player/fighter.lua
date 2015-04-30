@@ -1,3 +1,10 @@
+--[[
+Copyright:		2015, Luoheng. All rights reserved.
+File name: 		fighter
+Description: 	战士行为类
+Author: 		Luoheng
+Email:			287429173@qq.com
+]]
 Fighter = Fighter or BaseClass(BaseRole)
 
 Fighter.__default_arg = {

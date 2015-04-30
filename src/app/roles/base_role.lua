@@ -1,3 +1,10 @@
+--[[
+Copyright:		2015, Luoheng. All rights reserved.
+File name: 		base_role
+Description: 	游戏角色(包括玩家和敌人)行为基类
+Author: 		Luoheng
+Email:			287429173@qq.com
+]]
 BaseRole = BaseRole or BaseClass()
 
 function BaseRole:__init(attr,default)

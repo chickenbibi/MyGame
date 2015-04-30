@@ -1,3 +1,10 @@
+--[[
+Copyright:		2015, Luoheng. All rights reserved.
+File name: 		game_start_scene
+Description: 	游戏开始场景
+Author: 		Luoheng
+Email:			287429173@qq.com
+]]
 GameStartScene = GameStartScene or class("GameStartScene", function()
     return display.newScene("GameStartScene")
 end)

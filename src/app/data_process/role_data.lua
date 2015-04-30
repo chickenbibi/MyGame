@@ -1,3 +1,10 @@
+--[[
+Copyright:		2015, Luoheng. All rights reserved.
+File name: 		role_data
+Description: 	所有角色数据类
+Author: 		Luoheng
+Email:			287429173@qq.com
+]]
 RoleData = RoleData or BaseClass()
 
 function RoleData:__init(player_id,index)
