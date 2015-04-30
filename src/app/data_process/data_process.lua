@@ -1,10 +1,4 @@
---[[
-Copyright:		2015, Luoheng. All rights reserved.
-File name: 		data_process
-Description: 	数据处理中心，每次角色行为都将发送信息到此进行处理，然后返回
-Author: 		Luoheng
-Email:			287429173@qq.com
-]]
+
 DataProcess = DataProcess or BaseClass()
 
 function DataProcess:__init()

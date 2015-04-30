@@ -1,10 +1,3 @@
---[[
-Copyright:		2015, Luoheng. All rights reserved.
-File name: 		scene_manager
-Description: 	场景管理器，将所有场景统一在此创建和释放，注意场景接口的保持
-Author: 		Luoheng
-Email:			287429173@qq.com
-]]
 SceneManager = SceneManager or BaseClass()
 
 function SceneManager:__init()

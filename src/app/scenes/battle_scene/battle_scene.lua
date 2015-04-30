@@ -1,10 +1,3 @@
---[[
-Copyright:		2015, Luoheng. All rights reserved.
-File name: 		battle_scene
-Description: 	战斗场景
-Author: 		Luoheng
-Email:			287429173@qq.com
-]]
 BattleScene = BattleScene or class("BattleScene", function()
     return display.newScene("BattleScene")
 end)

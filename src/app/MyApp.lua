@@ -1,12 +1,3 @@
---[[
-Copyright:		2015, Luoheng. All rights reserved.
-File name: 		MyApp
-Description: 	游戏入口文件，注意:1、各个接口的初始化以及保持；2、文件引入的顺序
-Author: 		Luoheng
-Email:			287429173@qq.com
-Version: 		beta-0.5
-Date: 			4-30-2015
-]]
 require("config")
 require("cocos.init")
 require("framework.init")
