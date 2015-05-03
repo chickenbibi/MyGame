@@ -29,6 +29,7 @@ end
 
 function MyApp:run()
 	display.addSpriteFrames("res/roles/fighter.plist", "res/roles/fighter.png");
+	display.addSpriteFrames("res/roles/soldier.plist", "res/roles/soldier.png");
 
 
 	DataProcess.New()

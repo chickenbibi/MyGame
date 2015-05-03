@@ -8,6 +8,7 @@ Email:			287429173@qq.com
 BaseRole = BaseRole or BaseClass()
 
 function BaseRole:__init(attr,default)
+	self.default_args = default
 	self:InitAttribute(attr)
 	self:InitBaseStateMachine(default.events,default.callbacks)
 	self:InitSprite(default.sprite_name)
@@ -30,22 +31,22 @@ end
 function BaseRole:InitBaseStateMachine(events,callbacks)
 	-- 基类事件
 	self.events = {
-		{name = "start",  	from = "none",    						to = "idle" },
-		{name = "walk",  	from = "idle",   		 				to = "is_walking" },
-		{name = "attack",  	from = "idle",    						to = "is_attacking" },
-		{name = "kill",		from = "*",		  						to = "is_dead" },
-		{name = "backidle",		from = {"is_walking","is_attacking"},	to = "idle"},
+		{name = "start",  		from = "none",    				to = "idle" },
+		{name = "walk",			from = "idle",					to = "walking"},
+		{name = "attack",  		from = "idle",    				to = "attacking" },
+		{name = "stop",		from = {"walking","attacking"},		to = "idle"},
 	}
 	-- 合并子类事件
 	table.insertto(self.events, checktable(events))
 
 	-- 基类事件回调
 	self.callbacks = {
-        onstart       	= handler(self, self.onStart),
-        onwalk        	= handler(self, self.onWalk),
-        onattack       	= handler(self, self.onAttack),
-        onkill        	= handler(self, self.onKill),
-        onbackidle     	= handler(self, self.onbackidle),
+        onstart       		= handler(self, self.onStart),
+        onbeforewalk  		= handler(self, self.onbeforeWalk),
+        onafterwalk  		= handler(self, self.onafterWalk),
+        onbeforeattack      = handler(self, self.onbeforeAttack),
+        onafterattack 		= handler(self, self.onafterAttack),
+        onstop	     		= handler(self, self.onStop),
 	}
 	-- 合并子类事件回调
 	table.insertto(self.callbacks, checktable(callbacks))
@@ -70,11 +71,12 @@ function BaseRole:InitSprite(sprite_name)
 	self.sprite = display.newSprite(sprite_name)
 end
 
-function BaseRole:AddToScene(scene,pos)
+function BaseRole:AddToScene(scene,role)
 	if not self.sprite then
 	    error("Can't Find the sprite !!!")
 	end
-	self.sprite:setPosition(pos)
+	self.sprite:setPosition(role:GetPosition())
+	self.sprite:setLocalZOrder(role:GetPosition().y)
 	scene:addChild(self.sprite)
 end
 
@@ -82,15 +84,43 @@ function BaseRole:onStart()
 	-- self.fsm:dispatchEvent({name = SCENE_EVENT.ROLE_INIT})
 end
 
-function BaseRole:onWalk()
+function BaseRole:onbeforeWalk()
 end
 
-function BaseRole:onAttack()
+function BaseRole:onafterWalk()
 end
 
-function BaseRole:onKill()
+function BaseRole:onbeforeAttack()
 end
 
-function BaseRole:onbackidle()
-	print("onidle !!!")
+function BaseRole:onafterAttack()
+end
+
+function BaseRole:onStop()
+	local sprite_name = string.split(self.default_args.sprite_name, "#")
+	self.sprite:setSpriteFrame(display.newSpriteFrame(sprite_name[2]))
+end
+
+function BaseRole:GetRoleId()
+	return self.attr.role_id
+end
+
+function BaseRole:GetPosition()
+	return self.attr.pos
+end
+
+function BaseRole:DecreaseHp(damage)
+	if not damage then
+		return
+	end
+	if self.attr.hp <= damage then
+		self.attr.hp = 0
+	end
+	self.attr.hp = self.attr.hp - damage
+
+	-- HP减少特效
+	self:PlayHitAnimation()
+end
+
+function BaseRole:ToDead()
 end

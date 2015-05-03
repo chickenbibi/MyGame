@@ -15,7 +15,7 @@ Fighter.__default_arg = {
 
 function Fighter:__init(attr)
 	self.attack_pattrn = 3
-	self:addAnimation()
+	self:AddAnimation()
 end
 
 function Fighter:ChangeHp()
@@ -23,10 +23,10 @@ function Fighter:ChangeHp()
 	-- self:dispatchEvent({name = SCENE_EVENT.HP_CHANGED_EVENT})
 end
 
-function Fighter:addAnimation()
+function Fighter:AddAnimation()
 	-- 创建动作帧
     local animationNames = {"walk","attack1","attack2","hit","dead"}
-    local animationFrameNum = {4, 5, 5, 3, 4}
+    local animationFrameNum = {4, 4, 4, 2, 4}
  
     for i = 1, #animationNames do
         local frames = display.newFrames("fighter-" .. animationNames[i] .. "-%d.png", 1, animationFrameNum[i])
@@ -36,20 +36,32 @@ function Fighter:addAnimation()
 end
 
 function Fighter:onTouch()
+	if self.fsm:isState("attacking") then
+		return
+	end
 	self.fsm:doEvent("attack")
 end
 
-function BaseRole:onbackidle()
-	-- transition.playAnimationOnce(self.sprite, display.getAnimationCache("fighter-idle"))
-end
-
-function Fighter:onAttack()
+function Fighter:onbeforeAttack()
 	-- 当前攻击模式，1、2为轻击，3为重击
 	self.attack_pattrn = (self.attack_pattrn + 1) % 3 + 1
 	local attack_pattrn = 2
 	if self.attack_pattrn == 3 then
 	    attack_pattrn = 1
 	end
-	transition.playAnimationOnce(self.sprite, display.getAnimationCache("fighter-attack"..attack_pattrn))
-	self.fsm:doEvent("backidle")
+	transition.playAnimationOnce(self.sprite, 
+								 display.getAnimationCache("fighter-attack"..attack_pattrn),
+								 nil,
+								 function() self:AttackCallBack() end)
 end
+
+function Fighter:AttackCallBack()
+	DataProcess.Instance:CastSkill(100,self:GetRoleId())
+	self.fsm:doEvent("stop")
+end
+
+function Fighter:onafterAttack()
+	-- print("onafterAttack")
+	-- self.fsm:doEvent("stop")
+end
+

@@ -18,9 +18,16 @@ function BattleScene:ctor()
 	self:addChild(background)
 
 	-- 重置场景角色表
-	self:ResetRoleSceneTable()
+	self:ResetRoleTable()
 	-- 添加角色
-	self:AddPlayer(100)
+	local pos = cc.p(display.cx,display.cy)
+	self:AddPlayer(100,pos)
+	pos = cc.p(display.cx,display.cy - 100)
+	self:AddEnemy(1000,pos)
+	pos = cc.p(display.cx,display.cy + 100)
+	self:AddEnemy(1000,pos)
+	pos = cc.p(display.cx + 100,display.cy)
+	self:AddEnemy(1000,pos)
 	-- 添加触摸层
 	self:AddTouchLayer()
 end
@@ -36,33 +43,48 @@ function BattleScene:AddTouchLayer()
     self:addChild(self.layerTouch)
 end
 
-function BattleScene:ResetRoleSceneTable()
-	self.role_scene_table = {}
+function BattleScene:ResetRoleTable()
+	self.role_table = {}
 end
 
-function BattleScene:AddPlayer(role_id)
-	local player_attr = DataProcess.Instance:AddPlayer(role_id)
+function BattleScene:AddPlayer(role_id,pos)
+	local player_attr = DataProcess.Instance:AddPlayer(role_id,pos)
 	if player_attr then
 	    self.player = Fighter.New(player_attr)
-	    self.player:AddToScene(self,cc.p(display.left + 200, display.cy))
+	    self.player:AddToScene(self,self.player)
+	    self:AddRoleToTable(self.player)
 	end
 end
 
-function BattleScene:AddRoleToSceneTable(role)
-	if role == nil then
-		return
+function BattleScene:AddEnemy(role_id, pos)
+	local enemy_attr = DataProcess.Instance:AddEnemy(role_id,pos)
+	if enemy_attr then
+	    enemy = Soldier.New(enemy_attr)
+	    enemy:AddToScene(self,enemy)
+	    self:AddRoleToTable(enemy)
 	end
-	table.insert(self.role_scene_table,role)
 end
 
-function BattleScene:RemoveRoleFromSceneTable(role)
-	if role == nil then
+function BattleScene:AddRoleToTable(role)
+	if not role then
+		return
+	end
+	table.insert(self.role_table,role)
+end
+
+function BattleScene:RemoveRoleFromTable(role)
+	if not role then
 		return
 	end
 
-	for index = 1 , #self.role_scene_table do
-		if role.id_ == self.role_scene_table[index].id_ then
-		    table.remove(self.role_scene_table,index)
+	for index = 1 , #self.role_table do
+		if role:GetRoleId() == self.role_table[index]:GetRoleId() then
+		    table.remove(self.role_table,index)
+		    return
 		end
 	end
+end
+
+function BattleScene:GetRoleTable()
+	return self.role_table
 end

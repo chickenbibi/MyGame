@@ -40,6 +40,6 @@ function GameStartScene:InitEvents()
 end
 
 function GameStartScene:EnterNextScene()
-    display.replaceScene(BattleScene.Instance)
+    SceneManager.Instance:EnterScene(BattleScene.Instance)
     SceneManager.Instance:DeleteSceneFromMgr(GameStartScene.Instance)
 end
