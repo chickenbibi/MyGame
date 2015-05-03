@@ -26,7 +26,7 @@ end
 function Fighter:AddAnimation()
 	-- 创建动作帧
     local animationNames = {"walk","attack1","attack2","hit","dead"}
-    local animationFrameNum = {4, 4, 4, 2, 4}
+    local animationFrameNum = {4, 4, 4, 3, 4}
  
     for i = 1, #animationNames do
         local frames = display.newFrames("fighter-" .. animationNames[i] .. "-%d.png", 1, animationFrameNum[i])
