@@ -29,7 +29,7 @@ function BattleScene:ctor()
 	pos = cc.p(display.cx + 100,display.cy)
 	self:AddEnemy(1000,pos)
 	-- 添加触摸层
-	self:AddTouchLayer()
+	-- self:AddTouchLayer()
 end
 
 function BattleScene:AddTouchLayer()
@@ -43,6 +43,10 @@ function BattleScene:AddTouchLayer()
     self:addChild(self.layerTouch)
 end
 
+function BattleScene:GetTouchLayer()
+	return self.layerTouch
+end
+
 function BattleScene:ResetRoleTable()
 	self.role_table = {}
 end
@@ -53,6 +57,7 @@ function BattleScene:AddPlayer(role_id,pos)
 	    self.player = Fighter.New(player_attr)
 	    self.player:AddToScene(self,self.player)
 	    self:AddRoleToTable(self.player)
+	    SceneManager.Instance:SetPlayerRoleId(self.player:GetRoleId())
 	end
 end
 

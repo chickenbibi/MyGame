@@ -11,6 +11,8 @@ require("config")
 require("cocos.init")
 require("framework.init")
 require("framework.cc.mvc.BaseClass")
+-- 其他组件类
+require("app.units.init")
 -- 数据处理类
 require("app.data_process.init")
 -- 事件定义

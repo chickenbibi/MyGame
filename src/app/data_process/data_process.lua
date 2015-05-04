@@ -131,3 +131,8 @@ function DataProcess:NoticeDead(role)
 		end
 	end
 end
+
+function DataProcess:MoveRole(role_id,pos)
+	printf("Moving to x: %d",pos.x)
+	printf("Moving to y: %d",pos.y)
+end

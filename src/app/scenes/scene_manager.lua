@@ -12,9 +12,12 @@ function SceneManager:__init()
 	    error("SceneManager must be singleton!")
 	end
 	SceneManager.Instance = self
-
 	self:ResetData()
 
+	-- 摇杆初始化
+	StickUnits.New()
+
+	-- 场景初始化
 	GameStartScene.new()
 	BattleScene.new()
 
@@ -59,6 +62,8 @@ end
 
 function SceneManager:EnterScene(scene)
 	self.cur_scene = scene
+	StickUnits.Instance:RemoveFromScene()
+	StickUnits.Instance:AddToScene(scene)
 	display.replaceScene(scene)
 end
 
@@ -105,4 +110,12 @@ function SceneManager:NoticeDamage(target, damage)
 	for i = 1 , #target_role_table do
 		target_role_table[i]:DecreaseHp(damage)
 	end
+end
+
+function SceneManager:SetPlayerRoleId(RoleId)
+	self.player_role_id = RoleId
+end
+
+function SceneManager:GetPlayerRoleId()
+	return self.player_role_id
 end

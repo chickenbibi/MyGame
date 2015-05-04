@@ -14,7 +14,7 @@ function GameStartScene:ctor()
 	    error("GameStartScene must be singleton!")
 	end
 	GameStartScene.Instance = self
-	cc.FileUtils:getInstance():addSearchPath("res/game_start/")
+	cc.FileUtils:getInstance():addSearchPath("res/scenes/game_start/")
 	cc.uiloader:load("game_start.json"):addTo(self)
 
 	self:LoadJsonCallBack()
