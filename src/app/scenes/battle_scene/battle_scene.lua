@@ -22,7 +22,7 @@ function BattleScene:ctor()
 	-- 添加角色
 	local pos = cc.p(display.cx,display.cy)
 	self:AddPlayer(100,pos)
-	-- pos = cc.p(display.cx,display.cy - 100)
+	pos = cc.p(display.cx,display.cy - 100)
 	self:AddEnemy(1000,pos)
 	pos = cc.p(display.cx,display.cy + 100)
 	self:AddEnemy(1000,pos)

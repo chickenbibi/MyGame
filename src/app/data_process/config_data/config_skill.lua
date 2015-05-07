@@ -19,8 +19,8 @@ config_skill = {
 		name = "普通攻击",
 		damage = 0,
 		range = {
-			x = 100,
-			y = 20,
+			x = 150,
+			y = 10,
 		},
 		cd = 1,
 	}

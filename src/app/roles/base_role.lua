@@ -74,7 +74,7 @@ function BaseRole:AddToScene(scene,role)
 	if not self.sprite then
 	    error("Can't Find the sprite !!!")
 	end
-	self.sprite:setPosition(role:GetPosition())
+	self.sprite:setPosition(cc.p(role:GetPosition().x + self.__default_arg.pos_offsetX,role:GetPosition().y + self.__default_arg.pos_offsetY))
 	self.sprite:setLocalZOrder(CONFIG_ZORDER_ROLE-role:GetPosition().y+600)
 	scene:addChild(self.sprite)
 end
@@ -133,6 +133,6 @@ function BaseRole:MoveToPosition(pos)
 	    return
 	end
 	self.attr.pos = pos
-	self.sprite:setPosition(pos)
+	self.sprite:setPosition(cc.p(pos.x + self.__default_arg.pos_offsetX,pos.y + self.__default_arg.pos_offsetY))
 	self.sprite:setLocalZOrder(CONFIG_ZORDER_ROLE-pos.y+600)
 end

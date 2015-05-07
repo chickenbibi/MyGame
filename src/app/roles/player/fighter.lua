@@ -11,6 +11,8 @@ Fighter.__default_arg = {
 	sprite_name = "#fighter-walk-1.png",
 	events = {},
 	callbacks = {},
+	pos_offsetX = 83,
+	pos_offsetY = 0,
 }
 
 function Fighter:__init(attr)

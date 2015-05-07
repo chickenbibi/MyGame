@@ -11,6 +11,8 @@ Soldier.__default_arg = {
 	sprite_name = "#soldier-walk-1.png",
 	events = {},
 	callbacks = {},
+	pos_offsetX = 0,
+	pos_offsetY = -8,
 }
 
 
