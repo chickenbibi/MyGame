@@ -22,6 +22,6 @@ config_skill = {
 			x = 150,
 			y = 10,
 		},
-		cd = 1,
+		cd = 0,
 	}
 }

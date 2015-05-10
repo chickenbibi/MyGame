@@ -18,6 +18,11 @@ function RoleData:ResetData(pos,index)
 	self.attr.level = 1
 	self.attr.pos = pos
 	self.attr.direction = 1
+	self.skill_cd_handler = {}
+	self.attr.skill_cd = {}
+	setmetatable(self.attr.skill_cd, 
+				 {__index = function(t,k) return true end}
+				 )
 	-- 数据索引，角色数据唯一标识
 	self.attr.role_id = index
 end
@@ -54,6 +59,40 @@ function RoleData:SetPosition(pos)
 	    return
 	end
 	self.attr.pos = pos
+end
+
+function RoleData:JudgeifSkillCd(skill_id)
+	return self.attr.skill_cd[skill_id]
+end
+
+function RoleData:CalSkillCd(skill_id,cd)
+	if not skill_id then
+		error("[RoleData:CalSkillCd]:Skill_id Wrong !!!")
+	end
+	if cd == 0 then
+		return
+	end
+	self.attr.skill_cd[skill_id] = false
+	if not self.skill_cd_handler[skill_id] then
+		local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
+    	self.skill_cd_handler[skill_id] = scheduler.scheduleGlobal( function() 
+	    															        self.attr.skill_cd[skill_id] = true 
+	    															        if self.skill_cd_handler[skill_id] then
+	    															        	local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
+		    															        scheduler.unscheduleGlobal(self.skill_cd_handler[skill_id])
+		    															        self.skill_cd_handler[skill_id] = nil
+		    															    end
+	    															     end, 
+	    															     cd)
+    end
+end
+
+function RoleData:SetDirection(direction)
+	if direction > 0 then
+		self.attr.direction = 1
+	elseif direction < 0 then
+		self.attr.direction = -1
+	end
 end
 
 function RoleData:GetAttr()

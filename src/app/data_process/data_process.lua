@@ -35,22 +35,73 @@ function DataProcess:AddEnemy(role_id,pos)
 	return enemy_data:GetAttr()
 end
 
-function DataProcess:CastSkill(skill_id,role_id)
+function DataProcess:CastSkill(role_id,skill_id)
+	if not self:JudgeifSkillCd(role_id,skill_id) then
+		return
+	end
+	if not self.role_data_table then
+		return
+	end
 	local skill_range = self:GetSkillRange(skill_id)
 	if not skill_range then
 		return
 	end
+	local target = {}
+	for i = 1 , #self.role_data_table do
+		if self:GetRoleInRange(role_id,self.role_data_table[i]:GetRoleId(),skill_range) then
+			printf("self.role_data_table[%d] is target !!!",i)
+			table.insert(target,self.role_data_table[i])
+		end
+	end
+	self:CauseDamage(role_id,skill_id,target)
+	self:CauseEffect(role_id,skill_id,target)
+	self:CalSkillCd(role_id,skill_id)
+end
+
+function DataProcess:CalSkillCd(role_id,skill_id)
 	local role_info = self:GetRoleInfo(role_id)
 	if not role_info then
 		return
 	end
-	local target = self:GetRoleInRange(role_info,skill_range)
-	self:CauseDamage(role_info,skill_id,target)
-	self:CauseEffect(role_info,skill_id,target)
+	local cd = self:GetSkillCd(skill_id)
+	role_info:CalSkillCd(skill_id,cd)
 end
 
-function DataProcess:CauseDamage(role_info,skill_id,target)
-	if not target then
+function DataProcess:JudgeifSkillCd(role_id,skill_id)
+	local role_info = self:GetRoleInfo(role_id)
+	if not role_info then
+		return
+	end
+	return role_info:JudgeifSkillCd(skill_id)
+end
+
+function DataProcess:GetRoleInRange(role_id,target_id,skill_range,no_direction)
+	local role_info = self:GetRoleInfo(role_id)
+	local target_info = self:GetRoleInfo(target_id)
+	if not role_info or not target_info or not skill_range or not self.role_data_table then
+		return
+	end
+	if target_info:GetRoleType() == role_info:GetRoleType() then
+		return
+	end
+	if math.abs(target_info:GetPosition().x - role_info:GetPosition().x) <= skill_range.x and
+	   target_info:GetPosition().y <= role_info:GetPosition().y + skill_range.y and 
+	   target_info:GetPosition().y >= role_info:GetPosition().y - skill_range.y 
+	then
+		if not no_direction then
+		   	if target_info:GetPosition().x * role_info:GetDirection() >= role_info:GetPosition().x * role_info:GetDirection() then
+				return true
+			end
+		else
+			return true
+		end
+	end
+	return false
+end
+
+function DataProcess:CauseDamage(role_id,skill_id,target)
+	local role_info = self:GetRoleInfo(role_id)
+	if not role_info or not target then
 		return
 	end
 	local damage = 0
@@ -64,34 +115,22 @@ function DataProcess:CauseDamage(role_info,skill_id,target)
 	self:NoticeDamage(target,damage)
 end
 
-function DataProcess:CauseEffect(role_info,skill_id,target)
+function DataProcess:CauseEffect(role_id,skill_id,target)
 
-end
-
-function DataProcess:GetRoleInRange(role_info,skill_range)
-	if not role_info or not skill_range or not self.role_data_table then
-		return
-	end
-	local target = {}
-	for i = 1 , #self.role_data_table do
-		if self.role_data_table[i]:GetRoleType() ~= role_info:GetRoleType() then
-			if math.abs(self.role_data_table[i]:GetPosition().x - role_info:GetPosition().x) <= skill_range.x and
-			   self.role_data_table[i]:GetPosition().x * self.role_data_table[i]:GetDirection() >= role_info:GetPosition().x * self.role_data_table[i]:GetDirection() and
-			   self.role_data_table[i]:GetPosition().y <= role_info:GetPosition().y + skill_range.y and 
-			   self.role_data_table[i]:GetPosition().y >= role_info:GetPosition().y - skill_range.y 
-			then
-				table.insert(target,self.role_data_table[i])
-			end
-		end
-	end
-	return target
 end
 
 function DataProcess:GetSkillRange(skill_id)
-	if not config_skill[skill_id] then
+	if not skill_id or not config_skill[skill_id] then
 		return
 	end
 	return config_skill[skill_id].range
+end
+
+function DataProcess:GetSkillCd(skill_id)
+	if not skill_id or not config_skill[skill_id] then
+		return
+	end
+	return config_skill[skill_id].cd
 end
 
 function DataProcess:GetSkillDamage(skill_id)
@@ -139,6 +178,15 @@ function DataProcess:MoveRole(role_id,pos)
 	    return
 	end
 	local role_info = self:GetRoleInfo(role_id)
+	self:SetDirection(role_id,pos.x - role_info:GetPosition().x)
 	role_info:SetPosition(pos)
 	SceneManager.Instance:SetRolePosition(role_id,pos)
+end
+
+function DataProcess:SetDirection(role_id,direction)
+	local role_info = self:GetRoleInfo(role_id)
+	if not role_info then
+		return
+	end
+	role_info:SetDirection(direction)
 end

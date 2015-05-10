@@ -11,8 +11,11 @@ Fighter.__default_arg = {
 	sprite_name = "#fighter-walk-1.png",
 	events = {},
 	callbacks = {},
-	pos_offsetX = 83,
-	pos_offsetY = 0,
+	pos_offset = 
+		{
+			x = 83,
+			y = 0,
+		},
 }
 
 function Fighter:__init(attr)
@@ -42,6 +45,9 @@ function Fighter:onTouch()
 	if self.fsm:isState("attacking") then
 		return
 	end
+	if not DataProcess.Instance:JudgeifSkillCd(self:GetRoleId(),100) then
+		return
+	end
 	self.fsm:doEvent("attack")
 end
 
@@ -66,7 +72,7 @@ function Fighter:onbeforeAttack()
 end
 
 function Fighter:AttackCallBack()
-	DataProcess.Instance:CastSkill(100,self:GetRoleId())
+	DataProcess.Instance:CastSkill(self:GetRoleId(),100)
 	self:Stop()
 end
 
