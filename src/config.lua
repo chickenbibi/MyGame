@@ -31,3 +31,6 @@ CONFIG_ZORDER_ROLE = 100
 
 -- 移动刷新频率
 CONFIG_MOVE_RATE = 0.1
+
+-- 移动刷新像素
+CONFIG_MOVE_PIX = 10

@@ -12,6 +12,7 @@ function EnemyAI:__init()
  --    	local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
  --    	self.handle = scheduler.scheduleGlobal(function() self:SignRange() end, 1)
  --    end
+	 -- self:MoveToPlayer()
 end
 
 function EnemyAI:xx()
@@ -56,11 +57,18 @@ end
 function EnemyAI:MoveToPlayer()
 	local skill_config = self:GetSkillConfig(100)
 	local player = SceneManager.Instance:GetRoleById(SceneManager.Instance:GetPlayerRoleId())
-	local offsetX = math.random(-skill_config.range.x,skill_config.range.x)
-	local offsetY = math.random(-skill_config.range.y,skill_config.range.y)
+	local player_pos = player:GetPosition()
+	local offsetX = math.random(-(player_pos.x - self:GetPosition().x) / 2,player_pos.x - self:GetPosition().x)
+	local offsetY = math.random(-(player_pos.y - self:GetPosition().y) / 2,player_pos.y - self:GetPosition().y)
+	local distance = math.sqrt(math.pow(offsetX,2),math.pow(offsetY,2))
 	local pos = {
-		x = player:GetPosition().x + offsetX,
-		y = player:GetPosition().x + offsetY,
+		x = self:GetPosition().x + offsetX,
+		y = self:GetPosition().y + offsetY,
 	}
 	DataProcess.Instance:MoveRole(self:GetRoleId(),pos)
+	local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
+	scheduler.performWithDelayGlobal(function()
+									 	self:MoveToPlayer()	
+									 end,
+									 distance/CONFIG_MOVE_PIX)
 end

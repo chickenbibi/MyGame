@@ -7,8 +7,6 @@ Email:			287429173@qq.com
 ]]
 DataProcess = DataProcess or BaseClass()
 
-DataProcess.PIX_RATE = 10
-
 function DataProcess:__init()
 	if DataProcess.Instance ~= nil then
 	    error("BattleScene must be singleton!")
@@ -201,10 +199,10 @@ function DataProcess:SetRolePosition(role_id,target_pos)
 	local moveby_y = target_pos.y - role_pos.y
 	local distance = math.sqrt(math.pow((moveby_x), 2) + math.pow((moveby_y), 2))
 
-	if distance >= self.PIX_RATE then
+	if distance >= CONFIG_MOVE_PIX then
 	    local pos = {}
-	    pos.x = role_pos.x + self.PIX_RATE * moveby_x / distance
-	    pos.y = role_pos.y + self.PIX_RATE * moveby_y / distance
+	    pos.x = role_pos.x + CONFIG_MOVE_PIX * moveby_x / distance
+	    pos.y = role_pos.y + CONFIG_MOVE_PIX * moveby_y / distance
 	    role_info:SetPosition(pos)
 		SceneManager.Instance:SetRolePosition(role_id,pos)
 		self:SetDirection(role_id,pos.x - role_info:GetPosition().x)
