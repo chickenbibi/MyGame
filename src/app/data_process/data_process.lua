@@ -7,6 +7,8 @@ Email:			287429173@qq.com
 ]]
 DataProcess = DataProcess or BaseClass()
 
+DataProcess.PIX_RATE = 10
+
 function DataProcess:__init()
 	if DataProcess.Instance ~= nil then
 	    error("BattleScene must be singleton!")
@@ -17,6 +19,7 @@ end
 
 function DataProcess:ResetData()
 	self.role_data_table = {}
+	self.move_handler = {}
 	-- 每次增加角色之前自加一
 	self.data_id = 0
 end
@@ -171,16 +174,53 @@ function DataProcess:NoticeDead(role)
 	end
 end
 
-function DataProcess:MoveRole(role_id,pos)
-	printf("Moving to x: %d",pos.x)
-	printf("Moving to y: %d",pos.y)
-	if not role_id or not pos then
+function DataProcess:MoveRole(role_id,target_pos)
+	-- printf("Moving to x: %d",target_pos.x)
+	-- printf("Moving to y: %d",target_pos.y)
+	if not role_id or not target_pos then
+	    return
+	end
+	local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
+	if self.move_handler[role_id] then
+		scheduler.unscheduleGlobal(self.move_handler[role_id])
+	end
+	self:SetRolePosition(role_id,target_pos)
+	self.move_handler[role_id] = scheduler.scheduleGlobal(function()
+															  	  self:SetRolePosition(role_id,target_pos)
+															  end,
+															  CONFIG_MOVE_RATE)
+end
+
+function DataProcess:SetRolePosition(role_id,target_pos)
+	if not role_id or not target_pos then
 	    return
 	end
 	local role_info = self:GetRoleInfo(role_id)
-	self:SetDirection(role_id,pos.x - role_info:GetPosition().x)
-	role_info:SetPosition(pos)
-	SceneManager.Instance:SetRolePosition(role_id,pos)
+	local role_pos = role_info:GetPosition()
+	local moveby_x = target_pos.x - role_pos.x
+	local moveby_y = target_pos.y - role_pos.y
+	local distance = math.sqrt(math.pow((moveby_x), 2) + math.pow((moveby_y), 2))
+
+	if distance >= self.PIX_RATE then
+	    local pos = {}
+	    pos.x = role_pos.x + self.PIX_RATE * moveby_x / distance
+	    pos.y = role_pos.y + self.PIX_RATE * moveby_y / distance
+	    role_info:SetPosition(pos)
+		SceneManager.Instance:SetRolePosition(role_id,pos)
+		self:SetDirection(role_id,pos.x - role_info:GetPosition().x)
+	else
+	    local pos = {}
+	    pos.x = role_pos.x + moveby_x
+	    pos.y = role_pos.y + moveby_y
+	    role_info:SetPosition(pos)
+		SceneManager.Instance:SetRolePosition(role_id,pos)
+		self:SetDirection(role_id,pos.x - role_info:GetPosition().x)
+
+		if self.move_handler[role_id] then
+		    local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
+			scheduler.unscheduleGlobal(self.move_handler[role_id])
+		end
+	end
 end
 
 function DataProcess:SetDirection(role_id,direction)
@@ -189,4 +229,13 @@ function DataProcess:SetDirection(role_id,direction)
 		return
 	end
 	role_info:SetDirection(direction)
+end
+
+function DataProcess:TurnAround(role_id)
+	local role_info = self:GetRoleInfo(role_id)
+	if not role_info then
+		return
+	end
+	self:SetDirection(role_id,-role_info:GetDirection())
+	SceneManager.Instance:TurnRoleAround(role_id)
 end

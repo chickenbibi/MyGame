@@ -58,6 +58,8 @@ function RoleData:SetPosition(pos)
 	if not pos then
 	    return
 	end
+	printf("Moving to x: %d",pos.x)
+	printf("Moving to y: %d",pos.y)
 	self.attr.pos = pos
 end
 

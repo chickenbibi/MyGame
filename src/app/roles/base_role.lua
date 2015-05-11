@@ -112,6 +112,10 @@ function BaseRole:GetPosition()
 	return self.attr.pos
 end
 
+function BaseRole:GetDirection()
+	return self.attr.direction
+end
+
 function BaseRole:DecreaseHp(damage)
 	if not damage then
 		return
@@ -135,4 +139,8 @@ function BaseRole:MoveToPosition(pos)
 	self.attr.pos = pos
 	self.sprite:setPosition(cc.p(pos.x + self.__default_arg.pos_offset.x,pos.y + self.__default_arg.pos_offset.y))
 	self.sprite:setLocalZOrder(CONFIG_ZORDER_ROLE-pos.y+600)
+end
+
+function BaseRole:TurnAround()
+	
 end

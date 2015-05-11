@@ -21,6 +21,10 @@ Soldier.__default_arg = {
 			x = 0,
 			y = -8,
 		},
+	attack_pattrn = 
+		{
+			basic_attack = 10000,
+		},
 }
 
 
@@ -57,4 +61,25 @@ function Soldier:ToDead()
 						 			  end
 						}
 					 )
+end
+
+function Soldier:AttackByPattern(pattern)
+	if not pattern then
+	    return
+	end
+	if pattern < self.__default_arg.attack_pattrn.basic_attack then
+	    self:BasicAttack()
+	end
+end
+
+function Soldier:BasicAttack()
+	local player = SceneManager.Instance:GetRoleById(SceneManager.Instance:GetPlayerRoleId())
+	local skill_config = self:GetSkillConfig(100)
+	local offsetX = math.random(-skill_config.range.x,skill_config.range.x)
+	local offsetY = math.random(-skill_config.range.y,skill_config.range.y)
+	local pos = {
+		x = player:GetPosition().x + offsetX,
+		y = player:GetPosition().x + offsetY,
+	}
+	DataProcess.Instance:MoveRole(self:GetRoleId(),pos)
 end

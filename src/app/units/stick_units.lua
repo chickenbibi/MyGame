@@ -1,6 +1,13 @@
-PIX_RATE = 10
-
+--[[
+Copyright:		2015, Luoheng. All rights reserved.
+File name: 		stick_units
+Description: 	摇杆类
+Author: 		Luoheng
+Email:			287429173@qq.com
+]]
 StickUnits = StickUnits or BaseClass()
+
+StickUnits.PIX_RATE = 10
 
 function StickUnits:__init()
 	if StickUnits.Instance ~= nil then
@@ -34,13 +41,13 @@ function StickUnits:InitEvents()
 	self.background:addNodeEventListener(cc.NODE_TOUCH_EVENT, function(event) return true end)
 	self.background:addNodeEventListener(cc.NODE_TOUCH_CAPTURE_EVENT, function(event)
 		if event.name == "began" then
-			print("began")
+			print(event.name)
 			return true
 		end
 
 		if not self.handle then
 	    	local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
-	    	self.handle = scheduler.scheduleGlobal(function() self:TouchScheduler(self.x_,self.y_) end, 0.1)
+	    	self.handle = scheduler.scheduleGlobal(function() self:TouchScheduler(self.x_,self.y_) end, CONFIG_MOVE_RATE)
 	    end
 	    if event.name == "moved" then
 	    	-- 设置摇杆位置
@@ -55,8 +62,8 @@ function StickUnits:InitEvents()
 			local player = SceneManager.Instance:GetRoleById(SceneManager.Instance:GetPlayerRoleId())
 			player:DoMoveEvent()
 		end
-		if event.name == "ended" then
-			print("ended")
+		if event.name == "ended" or event.name == "cancelled" then
+			print(event.name)
 			-- 摇杆复原
 			self.stick:setPosition(cc.p(self.round_r, self.round_r))
 
@@ -71,10 +78,6 @@ function StickUnits:InitEvents()
 			player:Stop()
 		    return false
 		end
-		if event.name == "cancelled" then
-			print("cancelled")
-			return false
-	    end
 		return true
 	end)
 end
@@ -108,10 +111,11 @@ function StickUnits:TouchScheduler(event_x,event_y)
 	    return
 	end
 	local moveby_x,moveby_y = self:GetStickPosition(event_x,event_y)
-	moveby_x = PIX_RATE * moveby_x / self.round_r
-	moveby_y = PIX_RATE * moveby_y / self.round_r
+	moveby_x = self.PIX_RATE * moveby_x / self.round_r
+	moveby_y = self.PIX_RATE * moveby_y / self.round_r
 	local player_cur_pos = DataProcess.Instance:GetRoleInfo(SceneManager.Instance:GetPlayerRoleId()):GetPosition()
-	player_cur_pos.x = player_cur_pos.x + moveby_x
-	player_cur_pos.y = player_cur_pos.y + moveby_y
-	DataProcess.Instance:MoveRole(SceneManager.Instance:GetPlayerRoleId(),player_cur_pos)
+	local pos = {}
+	pos.x = player_cur_pos.x + moveby_x
+	pos.y = player_cur_pos.y + moveby_y
+	DataProcess.Instance:MoveRole(SceneManager.Instance:GetPlayerRoleId(),pos)
 end

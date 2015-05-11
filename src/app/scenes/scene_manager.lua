@@ -135,3 +135,11 @@ function SceneManager:SetRolePosition(role_id,pos)
 	    role:MoveToPosition(pos)
 	end
 end
+
+function SceneManager:TurnRoleAround(role_id)
+	local role = self:GetRoleById(role_id)
+	if not role then
+	    return
+	end
+	role:TurnAround()
+end
