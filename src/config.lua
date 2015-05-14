@@ -34,3 +34,6 @@ CONFIG_MOVE_RATE = 0.1
 
 -- 移动刷新像素
 CONFIG_MOVE_PIX = 10
+
+-- AI视野、攻击距离判断刷新频率
+CONFIG_SCHEDULER_RATE = 0.5

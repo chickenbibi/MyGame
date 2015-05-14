@@ -28,7 +28,7 @@ Soldier.__default_arg = {
 
 	-- 攻击模式
 	attack_pattrn = {
-		[1] = { name = "basic_attack", rate = 10000},
+		[1] = { name = "basic_attack", rate = 10000, skill_id = 100,},
 	},
 
 	-- 移动模式
@@ -40,6 +40,7 @@ Soldier.__default_arg = {
 
 function Soldier:__init(attr)
 	self:AddAnimation()
+	self:AddMovePattern()
 	self:SetupStateMachine()
 end
 
@@ -53,6 +54,13 @@ function Soldier:AddAnimation()
         local animation = display.newAnimation(frames, 0.1)
         display.setAnimationCache("soldier-" .. animationNames[i], animation)
     end
+end
+
+function Soldier:AddMovePattern()
+	self.move_pattern = {
+		["move_to_front"] = handler(self,self.MoveToFront),
+		["move_to_back"] = handler(self,self.MoveToBack),
+	}
 end
 
 function Soldier:PlayHitAnimation()
