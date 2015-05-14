@@ -20,13 +20,13 @@ function BattleScene:ctor()
 	-- 重置场景角色表
 	self:ResetRoleTable()
 	-- 添加角色
-	local pos = cc.p(display.cx,display.cy)
+	local pos = cc.p(display.cx -200,display.cy)
 	self:AddPlayer(100,pos)
-	pos = cc.p(display.cx,display.cy - 100)
-	self:AddEnemy(1000,pos)
-	pos = cc.p(display.cx,display.cy + 100)
-	self:AddEnemy(1000,pos)
-	pos = cc.p(display.cx + 100,display.cy)
+	pos = cc.p(display.cx + 300,display.cy - 100)
+	-- self:AddEnemy(1000,pos)
+	pos = cc.p(display.cx + 300,display.cy + 100)
+	-- self:AddEnemy(1000,pos)
+	pos = cc.p(display.cx + 400,display.cy)
 	self:AddEnemy(1000,pos)
 	-- 添加触摸层
 	self:AddTouchLayer()
@@ -94,4 +94,15 @@ end
 
 function BattleScene:GetRoleTable()
 	return self.role_table
+end
+
+function BattleScene:StartEnemyAI()
+	if not self.role_table then
+		return
+	end
+	for i = 1, #self.role_table do
+		if self.role_table[i].StartAI then
+			self.role_table[i]:StartAI()
+		end
+	end
 end

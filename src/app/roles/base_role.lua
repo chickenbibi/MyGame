@@ -9,7 +9,7 @@ BaseRole = BaseRole or BaseClass()
 
 function BaseRole:__init(attr)
 	self:InitAttribute(attr)
-	self:InitBaseStateMachine(self.__default_arg.events,self.__default_arg.callbacks)
+	self:InitBaseStateMachine()
 	self:InitSprite(self.__default_arg.sprite_name)
 end
 
@@ -23,20 +23,18 @@ function BaseRole:InitAttribute(attr)
 		self.attr = {}
 		for key, value in pairs(attr) do
 			self.attr[key] = value
-		end
+		end 
 	end
 end
 
-function BaseRole:InitBaseStateMachine(events,callbacks)
+function BaseRole:InitBaseStateMachine()
 	-- 基类事件
 	self.events = {
 		{name = "start",  		from = "none",    				to = "idle" },
 		{name = "walk",			from = "idle",					to = "walking"},
 		{name = "attack",  		from = "idle",    				to = "attacking" },
-		{name = "stop",		from = {"walking","attacking"},		to = "idle"},
+		{name = "stop",			from = {"walking","attacking"},	to = "idle"},
 	}
-	-- 合并子类事件
-	table.insertto(self.events, checktable(events))
 
 	-- 基类事件回调
 	self.callbacks = {
@@ -47,9 +45,9 @@ function BaseRole:InitBaseStateMachine(events,callbacks)
         onafterattack 		= handler(self, self.onafterAttack),
         onstop	     		= handler(self, self.onStop),
 	}
-	-- 合并子类事件回调
-	table.insertto(self.callbacks, checktable(callbacks))
+end
 
+function BaseRole:SetupStateMachine()
 	self.fsm = {}
     cc.GameObject.extend(self.fsm)
         :addComponent("components.behavior.StateMachine")

@@ -9,18 +9,16 @@ Fighter = Fighter or BaseClass(BaseRole)
 
 Fighter.__default_arg = {
 	sprite_name = "#fighter-walk-1.png",
-	events = {},
-	callbacks = {},
-	pos_offset = 
-		{
-			x = 83,
-			y = 0,
-		},
+	pos_offset = {
+		x = 83,
+		y = 0,
+	},
 }
 
 function Fighter:__init(attr)
 	self.attack_pattrn = 3
 	self:AddAnimation()
+	self:SetupStateMachine()
 end
 
 function Fighter:ChangeHp()

@@ -86,8 +86,7 @@ function DataProcess:GetRoleInRange(role_id,target_id,skill_range,no_direction)
 		return
 	end
 	if math.abs(target_info:GetPosition().x - role_info:GetPosition().x) <= skill_range.x and
-	   target_info:GetPosition().y <= role_info:GetPosition().y + skill_range.y and 
-	   target_info:GetPosition().y >= role_info:GetPosition().y - skill_range.y 
+	   math.abs(target_info:GetPosition().y - role_info:GetPosition().y) <= skill_range.y
 	then
 		if not no_direction then
 		   	if target_info:GetPosition().x * role_info:GetDirection() >= role_info:GetPosition().x * role_info:GetDirection() then
@@ -175,9 +174,6 @@ end
 function DataProcess:MoveRole(role_id,target_pos)
 	-- printf("Moving to x: %d",target_pos.x)
 	-- printf("Moving to y: %d",target_pos.y)
-	if not role_id or not target_pos then
-	    return
-	end
 	local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
 	if self.move_handler[role_id] then
 		scheduler.unscheduleGlobal(self.move_handler[role_id])
@@ -198,21 +194,28 @@ function DataProcess:SetRolePosition(role_id,target_pos)
 	local moveby_x = target_pos.x - role_pos.x
 	local moveby_y = target_pos.y - role_pos.y
 	local distance = math.sqrt(math.pow((moveby_x), 2) + math.pow((moveby_y), 2))
-
 	if distance >= CONFIG_MOVE_PIX then
 	    local pos = {}
 	    pos.x = role_pos.x + CONFIG_MOVE_PIX * moveby_x / distance
 	    pos.y = role_pos.y + CONFIG_MOVE_PIX * moveby_y / distance
+		if role_info:GetRoleType() == PLAYER_ROLE or 
+			(role_info:GetRoleType() == ENEMY_ROLE and not role_info:GetFocus()) then
+			self:TurnRoleAround(role_id,pos.x - role_info:GetPosition().x)
+		end
+		self:DirectToPlayer()
 	    role_info:SetPosition(pos)
 		SceneManager.Instance:SetRolePosition(role_id,pos)
-		self:SetDirection(role_id,pos.x - role_info:GetPosition().x)
 	else
 	    local pos = {}
 	    pos.x = role_pos.x + moveby_x
 	    pos.y = role_pos.y + moveby_y
+		if role_info:GetRoleType() == PLAYER_ROLE or 
+			(role_info:GetRoleType() == ENEMY_ROLE and not role_info:GetFocus()) then
+			self:TurnRoleAround(role_id,pos.x - role_info:GetPosition().x)
+		end
+		self:DirectToPlayer()
 	    role_info:SetPosition(pos)
 		SceneManager.Instance:SetRolePosition(role_id,pos)
-		self:SetDirection(role_id,pos.x - role_info:GetPosition().x)
 
 		if self.move_handler[role_id] then
 		    local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
@@ -229,11 +232,39 @@ function DataProcess:SetDirection(role_id,direction)
 	role_info:SetDirection(direction)
 end
 
-function DataProcess:TurnAround(role_id)
+function DataProcess:DirectToPlayer()
+	local player_info = self:GetRoleInfo(SceneManager.Instance:GetPlayerRoleId())
+	if not player_info then
+		return
+	end
+	if not self.role_data_table then
+		return
+	end
+	for i = 1, #self.role_data_table do
+		if self.role_data_table[i]:GetRoleType() == ENEMY_ROLE and self.role_data_table[i]:GetFocus() then
+			self:TurnRoleAround(self.role_data_table[i]:GetRoleId(), 
+							  player_info:GetPosition().x - self.role_data_table[i]:GetPosition().x)
+		end
+	end
+end
+
+function DataProcess:SetFocus(role_id,state)
 	local role_info = self:GetRoleInfo(role_id)
 	if not role_info then
 		return
 	end
-	self:SetDirection(role_id,-role_info:GetDirection())
-	SceneManager.Instance:TurnRoleAround(role_id)
+	role_info:SetFocus(state)
+end
+
+function DataProcess:TurnRoleAround(role_id,direction)
+	local role_info = self:GetRoleInfo(role_id)
+	if not role_info then
+		return
+	end
+	if direction then
+		role_info:SetDirection(direction)
+	else
+		role_info:SetDirection(-role_info:GetDirection())
+	end
+	
 end

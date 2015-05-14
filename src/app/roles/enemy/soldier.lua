@@ -9,27 +9,38 @@ Soldier = Soldier or BaseClass(EnemyAI)
 
 Soldier.__default_arg = {
 	sprite_name = "#soldier-walk-1.png",
-	events = {},
-	callbacks = {},
-	sign_range = 
-		{
-			x = 300,
-			y = 100,
-		},
-	pos_offset = 
-		{
-			x = 0,
-			y = -8,
-		},
-	attack_pattrn = 
-		{
-			basic_attack = 10000,
-		},
-}
 
+	pos_offset = {
+		x = 0,
+		y = -8,
+	},
+
+	patrol_range = {
+		x = 200,
+		y = 100,
+	},
+
+	-- 视野范围
+	sign_range = {
+		x = 300,
+		y = 100,
+	},
+
+	-- 攻击模式
+	attack_pattrn = {
+		[1] = { name = "basic_attack", rate = 10000},
+	},
+
+	-- 移动模式
+	move_pattern = {
+		[1] = { name = "move_to_front", rate = 5000},
+		[2] = { name = "move_to_back", rate = 10000},
+	},
+}
 
 function Soldier:__init(attr)
 	self:AddAnimation()
+	self:SetupStateMachine()
 end
 
 function Soldier:AddAnimation()
@@ -64,12 +75,12 @@ function Soldier:ToDead()
 end
 
 function Soldier:AttackByPattern(pattern)
-	if not pattern then
-	    return
-	end
-	if pattern < self.__default_arg.attack_pattrn.basic_attack then
-	    self:BasicAttack()
-	end
+	-- if not pattern then
+	--     return
+	-- end
+	-- if pattern < self.__default_arg.attack_pattrn.basic_attack then
+	--     self:BasicAttack()
+	-- end
 end
 
 function Soldier:BasicAttack()

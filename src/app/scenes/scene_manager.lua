@@ -65,6 +65,7 @@ function SceneManager:EnterScene(scene)
 	StickUnits.Instance:RemoveFromScene()
 	StickUnits.Instance:AddToScene(scene:GetTouchLayer())
 	display.replaceScene(scene)
+	scene:StartEnemyAI()
 end
 
 function SceneManager:UpdateRoleAttr(target)
@@ -139,7 +140,7 @@ end
 function SceneManager:TurnRoleAround(role_id)
 	local role = self:GetRoleById(role_id)
 	if not role then
-	    return
+		return
 	end
 	role:TurnAround()
 end

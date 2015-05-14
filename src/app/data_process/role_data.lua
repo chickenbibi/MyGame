@@ -18,6 +18,7 @@ function RoleData:ResetData(pos,index)
 	self.attr.level = 1
 	self.attr.pos = pos
 	self.attr.direction = 1
+	self.attr.focus = false
 	self.skill_cd_handler = {}
 	self.attr.skill_cd = {}
 	setmetatable(self.attr.skill_cd, 
@@ -46,6 +47,14 @@ function RoleData:GetRoleId()
 	return self.attr.role_id
 end
 
+function RoleData:GetFocus()
+	return self.attr.focus
+end
+
+function RoleData:SetFocus(state)
+	self.attr.focus = state
+end
+
 function RoleData:GetDirection()
 	return self.attr.direction
 end
@@ -58,8 +67,8 @@ function RoleData:SetPosition(pos)
 	if not pos then
 	    return
 	end
-	printf("Moving to x: %d",pos.x)
-	printf("Moving to y: %d",pos.y)
+	-- printf("Moving to x: %d",pos.x)
+	-- printf("Moving to y: %d",pos.y)
 	self.attr.pos = pos
 end
 
@@ -95,6 +104,7 @@ function RoleData:SetDirection(direction)
 	elseif direction < 0 then
 		self.attr.direction = -1
 	end
+	-- print(self.attr.direction)
 end
 
 function RoleData:GetAttr()
