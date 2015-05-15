@@ -59,7 +59,7 @@ end
 function Soldier:AddMovePattern()
 	self.move_pattern = {
 		["move_to_front"] = handler(self,self.MoveToFront),
-		["move_to_back"] = handler(self,self.MoveToBack),
+		["move_to_back"] = handler(self,self.MoveToAround),
 	}
 end
 

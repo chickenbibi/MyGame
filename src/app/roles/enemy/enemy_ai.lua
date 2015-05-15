@@ -43,12 +43,13 @@ function EnemyAI:StartAI()
 	self.dwell.y = self:GetPosition().y
 
 	local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
-	if not self.handle["patrol"] then
-		self.handle["patrol"] = scheduler.scheduleGlobal(function() 
-													   		self.fsm:doEvent("patrol") 
-													    end,
-													    5)
-	end
+	-- if not self.handle["patrol"] then
+	-- 	self.handle["patrol"] = scheduler.scheduleGlobal(function() 
+	-- 												   		self.fsm:doEvent("patrol") 
+	-- 												    end,
+	-- 												    5)
+	-- end
+	self.fsm:doEvent("patrol") 
 	self.handle["sign_range"] = scheduler.scheduleGlobal(function()
 															self:sign_range()
 														end,
@@ -57,16 +58,22 @@ end
 
 -- 巡逻
 function EnemyAI:onPatrol()
-	printf("Role_%d onPatroling !!!",self:GetRoleId())
+	-- printf("Role_%d onPatroling !!!",self:GetRoleId())
+	self:RandomSeed()
 	local moveby_x = math.random(-self.__default_arg.patrol_range.x,self.__default_arg.patrol_range.x)
 	local moveby_y = math.random(-self.__default_arg.patrol_range.y,self.__default_arg.patrol_range.y)
 
 	local distance = math.sqrt(math.pow(moveby_x,2),math.pow(moveby_y,2))
 	local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
-	scheduler.performWithDelayGlobal(function()
-									 	self.fsm:doEvent("stop")
-									 end,
-									 distance / CONFIG_MOVE_PIX * CONFIG_MOVE_RATE)
+	if self.handle["stop"] then
+		scheduler.unscheduleGlobal(self.handle["stop"])
+		self.handle["stop"] = nil
+	end
+	self.handle["stop"] = scheduler.performWithDelayGlobal(	function()
+																self.fsm:doEvent("stop")
+																self.fsm:doEvent("patrol")
+															end,
+												 			distance / CONFIG_MOVE_PIX * CONFIG_MOVE_RATE)
 	DataProcess.Instance:MoveRole(self:GetRoleId(),cc.p(moveby_x + self.dwell.x, moveby_y + self.dwell.y))
 end
 
@@ -95,16 +102,17 @@ function EnemyAI:FocusOnPlayer()
 	DataProcess:SetFocus(self:GetRoleId(),true)
 
 	-- 取消巡逻
-	if self.handle["patrol"] then
-		local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
-		scheduler.unscheduleGlobal(self.handle["patrol"])
-		self.handle["patrol"] = nil
+	local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
+	if self.handle["stop"] then
+		scheduler.unscheduleGlobal(self.handle["stop"])
+		self.handle["stop"] = nil
 	end
 
 	self:RandomPattern()
 end
 
 function EnemyAI:RandomPattern()
+	self:RandomSeed()
 	if not self.__default_arg.attack_pattrn then
 		return
 	end
@@ -122,6 +130,7 @@ function EnemyAI:RandomPattern()
 end
 
 function EnemyAI:RandomMovePattern(skill_id)
+	self:RandomSeed()
 	if not self.__default_arg.move_pattern then
 		return
 	end
@@ -129,7 +138,8 @@ function EnemyAI:RandomMovePattern(skill_id)
 	print("pattern = ",pattern)
 	for k,v in pairs(self.__default_arg.move_pattern) do
 		if pattern <= v.rate then
-			self.move_pattern[v.name]()
+			self.move_pattern[v.name](skill_id)
+			return
 		end
 	end
 end
@@ -138,8 +148,50 @@ function EnemyAI:MoveToFront()
 	print("MoveToFront")
 end
 
-function EnemyAI:MoveToBack()
+function EnemyAI:MoveToBack(skill_id)
 	print("MoveToBack")
+	self:RandomSeed()
+
+	local skill_config = self:GetSkillConfig(skill_id)
+	local player = SceneManager.Instance:GetRoleById(SceneManager.Instance:GetPlayerRoleId())
+	local pos = player:GetPosition()
+	local offsetX = math.random(0,skill_config.range.x)
+	local offsetY = math.random(0,skill_config.range.y)
+	local distance = math.sqrt(math.pow(pos.x - offsetX - self:GetPosition().x,2),math.pow(pos.y - offsetY - self:GetPosition().y,2))
+	DataProcess.Instance:MoveRole(self:GetRoleId(),cc.p(pos.x - offsetX, pos.y - offsetY))
+
+	self:FollowPlayer(skill_id)
+end
+
+function EnemyAI:MoveToAround(skill_id)
+	self:RandomSeed()
+
+	local player = SceneManager.Instance:GetRoleById(SceneManager.Instance:GetPlayerRoleId())
+	local pos = player:GetPosition()
+	local vertical = self:GetPosition().y - pos.y
+	if vertical > 0 then
+	    vertical = 1
+	else
+		vertical = -1
+	end
+	local offsetX = math.random(CONFIG_AI_MOVE_X.min,CONFIG_AI_MOVE_X.max)
+	local offsetY = math.random(CONFIG_AI_MOVE_Y.min,CONFIG_AI_MOVE_Y.max)
+	local distance = math.sqrt(math.pow(pos.x + offsetX - self:GetPosition().x,2),math.pow(pos.y + offsetY - self:GetPosition().y,2))
+	DataProcess.Instance:MoveRole(self:GetRoleId(),cc.p(pos.x + offsetX, pos.y + offsetY))
+
+	local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
+	if self.handle["MoveToAround"] then
+		scheduler.unscheduleGlobal(self.handle["MoveToAround"])
+		self.handle["MoveToAround"] = nil
+	end
+	self.handle["MoveToAround"] = scheduler.performWithDelayGlobal( function()
+																		self:MoveToBack(skill_id)
+																	end,
+												 					distance / CONFIG_MOVE_PIX * CONFIG_MOVE_RATE)
+end
+
+function EnemyAI:FollowPlayer(skill_id)
+	
 end
 
 -- 朝玩家靠近(近战型敌人)
@@ -169,6 +221,7 @@ end
 
 -- 根据权值接近玩家
 function EnemyAI:CloseToPlayerByWeight()
+	self:RandomSeed()
 	if not self.__default_arg.move_pattern then
 		return
 	end
@@ -213,4 +266,8 @@ end
 
 function EnemyAI:Attack(skill_id)
 	print("Attack !!!")
+end
+
+function EnemyAI:RandomSeed()
+	math.randomseed(tostring(os.time() + self:GetRoleId() * 333 + 1):reverse():sub(1, 6))
 end
