@@ -38,6 +38,10 @@ CONFIG_MOVE_PIX = 10
 -- AI视野、攻击距离判断刷新频率
 CONFIG_SCHEDULER_RATE = 0.5
 
--- AI移动位置
+-- AI移动位置(上下)
+CONFIG_AI_MOVE_X = {min = -20,max = 20}
+CONFIG_AI_MOVE_Y = {min = 100,max = 200}
+
+-- AI移动位置(上下)
 CONFIG_AI_MOVE_X = {min = -20,max = 20}
 CONFIG_AI_MOVE_Y = {min = 100,max = 200}

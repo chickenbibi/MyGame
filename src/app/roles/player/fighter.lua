@@ -56,33 +56,43 @@ function Fighter:DoMoveEvent()
 	self.fsm:doEvent("walk")
 end
 
-function Fighter:onbeforeAttack()
+-- function Fighter:onbeforeAttack()
+-- 	-- 当前攻击模式，1、2为轻击，3为重击
+-- 	self.attack_pattrn = (self.attack_pattrn + 1) % 3 + 1
+-- 	local attack_pattrn = 2
+-- 	if self.attack_pattrn == 3 then
+-- 	    attack_pattrn = 1
+-- 	end
+-- 	transition.playAnimationOnce(self.sprite, 
+-- 								 display.getAnimationCache("fighter-attack"..attack_pattrn),
+-- 								 nil,
+-- 								 function() self:AttackCallBack() end)
+-- end
+
+-- function Fighter:AttackCallBack()
+-- 	DataProcess.Instance:CastSkill(self:GetRoleId(),100)
+-- 	self:Stop()
+-- end
+
+function Fighter:onAttacking()
+	local func = function()
+		DataProcess.Instance:CastSkill(self:GetRoleId(),100)
+		if not self.fsm:isState("idle") then
+			self.fsm:doEvent("stop")
+		end
+	end
+
 	-- 当前攻击模式，1、2为轻击，3为重击
 	self.attack_pattrn = (self.attack_pattrn + 1) % 3 + 1
 	local attack_pattrn = 2
 	if self.attack_pattrn == 3 then
 	    attack_pattrn = 1
 	end
-	transition.playAnimationOnce(self.sprite, 
-								 display.getAnimationCache("fighter-attack"..attack_pattrn),
-								 nil,
-								 function() self:AttackCallBack() end)
-end
-
-function Fighter:AttackCallBack()
-	DataProcess.Instance:CastSkill(self:GetRoleId(),100)
-	self:Stop()
+	self:PlayAnimationOnce("attack"..attack_pattrn,func)
 end
 
 function Fighter:Stop()
-	if not self.fsm:isState("walking") and not self.fsm:isState("attacking") then
-	    return
+	if not self.fsm:isState("idle") then
+		self.fsm:doEvent("stop")
 	end
-	self.fsm:doEvent("stop")
 end
-
-function Fighter:onafterAttack()
-	-- print("onafterAttack")
-	-- self.fsm:doEvent("stop")
-end
-

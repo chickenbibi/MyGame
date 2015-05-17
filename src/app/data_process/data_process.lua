@@ -37,6 +37,7 @@ function DataProcess:AddEnemy(role_id,pos)
 end
 
 function DataProcess:CastSkill(role_id,skill_id)
+	printf("CastSkill:%d -- %d",role_id,skill_id)
 	if not self:JudgeifSkillCd(role_id,skill_id) then
 		return
 	end
@@ -177,12 +178,21 @@ function DataProcess:MoveRole(role_id,target_pos)
 	local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
 	if self.move_handler[role_id] then
 		scheduler.unscheduleGlobal(self.move_handler[role_id])
+		self.move_handler[role_id] = nil
 	end
 	self:SetRolePosition(role_id,target_pos)
 	self.move_handler[role_id] = scheduler.scheduleGlobal(function()
 															  	  self:SetRolePosition(role_id,target_pos)
 															  end,
 															  CONFIG_MOVE_RATE)
+end
+
+function DataProcess:StopRole(role_id)
+	local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
+	if self.move_handler[role_id] then
+		scheduler.unscheduleGlobal(self.move_handler[role_id])
+		self.move_handler[role_id] = nil
+	end
 end
 
 function DataProcess:SetRolePosition(role_id,target_pos)

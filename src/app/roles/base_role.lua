@@ -30,20 +30,20 @@ end
 function BaseRole:InitBaseStateMachine()
 	-- 基类事件
 	self.events = {
-		{name = "start",  		from = "none",    				to = "idle" },
-		{name = "walk",			from = "idle",					to = "walking"},
-		{name = "attack",  		from = "idle",    				to = "attacking" },
-		{name = "stop",			from = {"walking","attacking"},	to = "idle"},
+		{name = "start",  		from = "none",    							to = "idle" },
+		{name = "walk",			from = "idle",								to = "walking"},
+		{name = "attack",  		from = "idle",    							to = "attacking" },
+		{name = "stop",			from = {"walking","attacking","hitted"},	to = "idle"},
+		{name = "hit",			from = "*",									to = "hitted"},
 	}
 
 	-- 基类事件回调
 	self.callbacks = {
         onstart       		= handler(self, self.onStart),
-        onbeforewalk  		= handler(self, self.onbeforeWalk),
-        onafterwalk  		= handler(self, self.onafterWalk),
-        onbeforeattack      = handler(self, self.onbeforeAttack),
-        onafterattack 		= handler(self, self.onafterAttack),
+        onwalking			= handler(self, self.onWalking),
+        onattacking 		= handler(self, self.onAttacking),
         onstop	     		= handler(self, self.onStop),
+        onhitted 			= handler(self, self.onHitted),
 	}
 end
 
@@ -81,22 +81,24 @@ function BaseRole:onStart()
 	-- self.fsm:dispatchEvent({name = SCENE_EVENT.ROLE_INIT})
 end
 
-function BaseRole:onbeforeWalk()
-	local str = string.split(self.__default_arg.sprite_name, "#")
-	local name = string.split(str[2], "-")
-	transition.playAnimationForever(self.sprite, display.getAnimationCache(name[1].."-walk"))
-end
-
 function BaseRole:onafterWalk()
 end
 
-function BaseRole:onbeforeAttack()
-end
-
-function BaseRole:onafterAttack()
+function BaseRole:onAttacking(skill_id)
+	if not self:GetSkillConfig(skill_id) then
+		skill_id = 100
+	end
+	local func = function()
+		DataProcess.Instance:CastSkill(self:GetRoleId(),skill_id)
+		if not self.fsm:isState("idle") then
+			self.fsm:doEvent("stop")
+		end
+	end
+	self:PlayAnimationOnce("attack",func)
 end
 
 function BaseRole:onStop()
+	DataProcess.Instance:StopRole(self:GetRoleId())
 	transition.stopTarget(self.sprite)
 	local sprite_name = string.split(self.__default_arg.sprite_name, "#")
 	self.sprite:setSpriteFrame(display.newSpriteFrame(sprite_name[2]))
@@ -114,6 +116,14 @@ function BaseRole:GetDirection()
 	return self.attr.direction
 end
 
+function BaseRole:onWalking()
+	self:PlayAnimationForever("walk")
+end
+
+function BaseRole:onleaveWalking()
+	self:onStop()
+end
+
 function BaseRole:DecreaseHp(damage)
 	if not damage then
 		return
@@ -124,7 +134,26 @@ function BaseRole:DecreaseHp(damage)
 	self.attr.hp = self.attr.hp - damage
 
 	-- HP减少特效
-	self:PlayHitAnimation()
+	self.fsm:doEvent("hit")
+end
+
+function BaseRole:onHitted()
+	local func = function()
+		self.fsm:doEvent("stop")
+	end
+	self:PlayAnimationOnce("hit",func)
+end
+
+function BaseRole:PlayAnimationOnce(action,func)
+	local str = string.split(self.__default_arg.sprite_name, "#")
+	local name = string.split(str[2], "-")
+	transition.playAnimationOnce(self.sprite, display.getAnimationCache(name[1].."-"..action),nil,func)
+end
+
+function BaseRole:PlayAnimationForever(action)
+	local str = string.split(self.__default_arg.sprite_name, "#")
+	local name = string.split(str[2], "-")
+	transition.playAnimationForever(self.sprite, display.getAnimationCache(name[1].."-"..action))
 end
 
 function BaseRole:ToDead()
@@ -141,4 +170,8 @@ end
 
 function BaseRole:TurnAround()
 	
+end
+
+function BaseRole:GetSkillConfig(skill_id)
+	return config_skill[skill_id]
 end

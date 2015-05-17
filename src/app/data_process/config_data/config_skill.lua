@@ -20,7 +20,7 @@ config_skill = {
 		damage = 0,
 		range = {
 			x = 150,
-			y = 10,
+			y = 20,
 		},
 		cd = 0,
 	}
