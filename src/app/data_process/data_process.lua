@@ -37,7 +37,6 @@ function DataProcess:AddEnemy(role_id,pos)
 end
 
 function DataProcess:CastSkill(role_id,skill_id)
-	printf("CastSkill:%d -- %d",role_id,skill_id)
 	if not self:JudgeifSkillCd(role_id,skill_id) then
 		return
 	end
@@ -51,7 +50,6 @@ function DataProcess:CastSkill(role_id,skill_id)
 	local target = {}
 	for i = 1 , #self.role_data_table do
 		if self:GetRoleInRange(role_id,self.role_data_table[i]:GetRoleId(),skill_range) then
-			printf("self.role_data_table[%d] is target !!!",i)
 			table.insert(target,self.role_data_table[i])
 		end
 	end
@@ -208,22 +206,22 @@ function DataProcess:SetRolePosition(role_id,target_pos)
 	    local pos = {}
 	    pos.x = role_pos.x + CONFIG_MOVE_PIX * moveby_x / distance
 	    pos.y = role_pos.y + CONFIG_MOVE_PIX * moveby_y / distance
-		if role_info:GetRoleType() == PLAYER_ROLE or 
-			(role_info:GetRoleType() == ENEMY_ROLE and not role_info:GetFocus()) then
+		if role_info:GetRoleType() == ENEMY_ROLE and role_info:GetFocus() then
+			self:DirectToPlayer()
+		else
 			self:TurnRoleAround(role_id,pos.x - role_info:GetPosition().x)
 		end
-		self:DirectToPlayer()
 	    role_info:SetPosition(pos)
 		SceneManager.Instance:SetRolePosition(role_id,pos)
 	else
 	    local pos = {}
 	    pos.x = role_pos.x + moveby_x
 	    pos.y = role_pos.y + moveby_y
-		if role_info:GetRoleType() == PLAYER_ROLE or 
-			(role_info:GetRoleType() == ENEMY_ROLE and not role_info:GetFocus()) then
+		if role_info:GetRoleType() == ENEMY_ROLE and role_info:GetFocus() then
+			self:DirectToPlayer()
+		else
 			self:TurnRoleAround(role_id,pos.x - role_info:GetPosition().x)
 		end
-		self:DirectToPlayer()
 	    role_info:SetPosition(pos)
 		SceneManager.Instance:SetRolePosition(role_id,pos)
 
@@ -276,5 +274,5 @@ function DataProcess:TurnRoleAround(role_id,direction)
 	else
 		role_info:SetDirection(-role_info:GetDirection())
 	end
-	
+	SceneManager.Instance:TurnRoleAround(role_id,role_info)
 end

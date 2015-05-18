@@ -34,7 +34,6 @@ function EnemyAI:AddMachineState()
 end
 
 function EnemyAI:StartAI()
-	print("StartAI !!!")
 	self.dwell = {}
 	self.dwell.x = self:GetPosition().x
 	self.dwell.y = self:GetPosition().y
@@ -53,7 +52,6 @@ end
 
 -- 巡逻
 function EnemyAI:onPatrol()
-	-- printf("Role_%d onPatroling !!!",self:GetRoleId())
 	self:RandomSeed()
 	local moveby_x = math.random(-self.__default_arg.patrol_range.x,self.__default_arg.patrol_range.x)
 	local moveby_y = math.random(-self.__default_arg.patrol_range.y,self.__default_arg.patrol_range.y)
@@ -92,12 +90,10 @@ function EnemyAI:SignRange()
 		end
 		self:FocusOnPlayer()
 	end
-	return ret
 end
 
 function EnemyAI:FocusOnPlayer()
-	print("Player is nearby , we should do something !!")
-	DataProcess:SetFocus(self:GetRoleId(),true)
+	DataProcess.Instance:SetFocus(self:GetRoleId(),true)
 
 	-- 取消巡逻
 	local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
@@ -133,7 +129,6 @@ function EnemyAI:RandomPattern()
 end
 
 function EnemyAI:RandomAttackPattern()
-	print("RandomAttackPattern")
 	self:RandomSeed()
 	local skill_id = 100
 	local pattern = math.random(1,10000)
@@ -157,9 +152,12 @@ function EnemyAI:RandomAttackPattern()
 end
 
 function EnemyAI:RandomMovePattern(range)
-	print("RandomMovePattern")
 	self:RandomSeed()
-	self.fsm:doEvent("walk")
+	if self.fsm:canDoEvent("walk") then
+		self.fsm:doEvent("walk")
+	else
+		self:RandomPattern()
+	end
 	if not self.__default_arg.move_pattern then
 		return
 	end
@@ -176,6 +174,9 @@ function EnemyAI:MoveToAround(range)
 	self:RandomSeed()
 
 	local player = SceneManager.Instance:GetRoleById(SceneManager.Instance:GetPlayerRoleId())
+	if not player then
+	    self:StopAI()
+	end
 	local pos = player:GetPosition()
 	local vertical = math.random(-10000,10000)
 	if vertical > 0 then
@@ -206,8 +207,10 @@ function EnemyAI:MoveToAround(range)
 end
 
 function EnemyAI:MoveToFront(range)
-	print("MoveToFront")
 	local player = SceneManager.Instance:GetRoleById(SceneManager.Instance:GetPlayerRoleId())
+	if not player then
+	    self:StopAI()
+	end
 	local pos = player:GetPosition()
 	local offsetX = math.random(range.x,range.x + 100)
 	local offsetY = math.random(-range.y,range.y)
@@ -226,10 +229,12 @@ function EnemyAI:MoveToFront(range)
 end
 
 function EnemyAI:MoveToBack(range)
-	print("MoveToBack")
 	self:RandomSeed()
 
 	local player = SceneManager.Instance:GetRoleById(SceneManager.Instance:GetPlayerRoleId())
+	if not player then
+	    self:StopAI()
+	end
 	local pos = player:GetPosition()
 	local offsetX = math.random(range.x,range.x+100)
 	local offsetY = math.random(-range.y,range.y)
@@ -251,6 +256,9 @@ function EnemyAI:FollowPlayer(range)
 	self:RandomSeed()
 
 	local player = SceneManager.Instance:GetRoleById(SceneManager.Instance:GetPlayerRoleId())
+	if not player then
+	    self:StopAI()
+	end
 	local pos = player:GetPosition()
 	local vertical = self:GetPosition().y - pos.y
 	if vertical > 0 then
@@ -273,15 +281,16 @@ end
 
 -- 到达攻击范围
 function EnemyAI:AttackRange(skill_id)
-	print("AttackRange:",skill_id)
 	local skill_config = self:GetSkillConfig(skill_id)
 	local player = SceneManager.Instance:GetRoleById(SceneManager.Instance:GetPlayerRoleId())
+	if not player then
+	    self:StopAI()
+	end
 	local player_pos = player:GetPosition()
 	local ret = DataProcess.Instance:GetRoleInRange(
 													self:GetRoleId(),
 													SceneManager.Instance:GetPlayerRoleId(),
-													skill_config.range,
-													true
+													skill_config.range
 													)
 	if ret then
 		local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
@@ -292,17 +301,26 @@ function EnemyAI:AttackRange(skill_id)
 end
 
 function EnemyAI:Attack(skill_id)
-	print("Attack !!!")
 
 	if not self.fsm:isState("idle") then
 		self.fsm:doEvent("stop")
 	end
 	self.fsm:doEvent("attack")
-	local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
-	if self.handle["attack_range"] then
-		scheduler.unscheduleGlobal(self.handle["attack_range"])
-		self.handle["attack_range"] = nil
+	-- local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
+	-- if self.handle["attack_range"] then
+	-- 	scheduler.unscheduleGlobal(self.handle["attack_range"])
+	-- 	self.handle["attack_range"] = nil
+	-- end
+end
+
+function EnemyAI:onAttacking()
+	local skill_id = 100
+	local func = function()
+		DataProcess.Instance:CastSkill(self:GetRoleId(),skill_id)
+		self:StopAI()
+		self:StartAI()
 	end
+	self:PlayAnimationOnce("attack",func)
 end
 
 function EnemyAI:GetSkillConfig(skill_id)
@@ -318,7 +336,7 @@ function EnemyAI:RandomSeed()
 end
 
 function EnemyAI:StopAI()
-	if not self.fsm:isState("idle") then
+	if self.fsm:canDoEvent("stop") then
 		self.fsm:doEvent("stop")
 	end
 	local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
@@ -332,7 +350,6 @@ function EnemyAI:StopAI()
 end
 
 function EnemyAI:onHitted()
-	print("EnemyAI:onHitted")
 	local func = function()
 		self:StartAI()
 	end
@@ -340,8 +357,12 @@ function EnemyAI:onHitted()
 	self:PlayAnimationOnce("hit",func)
 end
 
-function EnemyAI:ToDead()
+function BaseRole:ToDead()
 	self:StopAI()
+	self.fsm:doEvent("killed")
+end
+
+function BaseRole:onDead()
 	-- 死亡动作
 	local func = function()
 		transition.fadeTo(self.sprite, 
@@ -350,10 +371,19 @@ function EnemyAI:ToDead()
 							 onComplete = function() 
 							 				self.sprite:removeFromParent()
 							 				self:DeleteMe()
-							 				print("I'm Realy Dead !!!")
 							 			  end
 							}
 						 )
 	end
 	self:PlayAnimationOnce("dead",func)
+end
+
+function EnemyAI:TurnAround()
+	if self:GetDirection() == -1 then
+		self.sprite:setAnchorPoint(cc.p(0.65,0.5))
+		self.sprite:setFlippedX(false)
+	else
+		self.sprite:setAnchorPoint(cc.p(0.35,0.5))
+		self.sprite:setFlippedX(true)
+	end
 end

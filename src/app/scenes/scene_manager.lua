@@ -107,6 +107,7 @@ function SceneManager:GetRoleById(role_id)
 			return scene_role_table[j]
 		end
 	end
+	return false
 end
 
 function SceneManager:NoticeDamage(target, damage)
@@ -137,10 +138,13 @@ function SceneManager:SetRolePosition(role_id,pos)
 	end
 end
 
-function SceneManager:TurnRoleAround(role_id)
+function SceneManager:TurnRoleAround(role_id,role_info)
 	local role = self:GetRoleById(role_id)
-	if not role then
+	if not role or not role_info then
 		return
 	end
+	local target = {}
+	table.insert(target,role_info)
+	self:UpdateRoleAttr(target)
 	role:TurnAround()
 end

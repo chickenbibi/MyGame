@@ -32,9 +32,10 @@ function BaseRole:InitBaseStateMachine()
 	self.events = {
 		{name = "start",  		from = "none",    							to = "idle" },
 		{name = "walk",			from = "idle",								to = "walking"},
-		{name = "attack",  		from = "idle",    							to = "attacking" },
+		{name = "attack",  		from = {"idle", "walking"},    				to = "attacking" },
 		{name = "stop",			from = {"walking","attacking","hitted"},	to = "idle"},
 		{name = "hit",			from = "*",									to = "hitted"},
+		{name = "killed",		from = "*",									to = "dead"},
 	}
 
 	-- 基类事件回调
@@ -44,6 +45,7 @@ function BaseRole:InitBaseStateMachine()
         onattacking 		= handler(self, self.onAttacking),
         onstop	     		= handler(self, self.onStop),
         onhitted 			= handler(self, self.onHitted),
+        ondead 				= handler(self, self.onDead)
 	}
 end
 
@@ -72,7 +74,10 @@ function BaseRole:AddToScene(scene,role)
 	if not self.sprite then
 	    error("Can't Find the sprite !!!")
 	end
-	self.sprite:setPosition(cc.p(role:GetPosition().x + self.__default_arg.pos_offset.x,role:GetPosition().y + self.__default_arg.pos_offset.y))
+	-- self.sprite:setPosition(cc.p(self:GetPosition().x + self.__default_arg.pos_offset.x * self:GetDirection() + self.__default_arg.pos_offset.regular_x,
+	-- 						self:GetPosition().y + self.__default_arg.pos_offset.regular_y))
+	self.sprite:setAnchorPoint(cc.p(0.32,0.5))
+	self.sprite:setPosition(cc.p(self:GetPosition().x , self:GetPosition().y))
 	self.sprite:setLocalZOrder(CONFIG_ZORDER_ROLE-role:GetPosition().y+600)
 	scene:addChild(self.sprite)
 end
@@ -156,20 +161,49 @@ function BaseRole:PlayAnimationForever(action)
 	transition.playAnimationForever(self.sprite, display.getAnimationCache(name[1].."-"..action))
 end
 
-function BaseRole:ToDead()
-end
-
 function BaseRole:MoveToPosition(pos)
 	if not pos then
 	    return
 	end
 	self.attr.pos = pos
-	self.sprite:setPosition(cc.p(pos.x + self.__default_arg.pos_offset.x,pos.y + self.__default_arg.pos_offset.y))
+	-- self.sprite:setPosition(cc.p(pos.x + self.__default_arg.pos_offset.x * self:GetDirection() + self.__default_arg.pos_offset.regular_x,
+	-- 						pos.y + self.__default_arg.pos_offset.regular_y))
+	self.sprite:setPosition(cc.p(pos.x , pos.y))
 	self.sprite:setLocalZOrder(CONFIG_ZORDER_ROLE-pos.y+600)
 end
 
 function BaseRole:TurnAround()
-	
+	if self:GetDirection() == 1 then
+		self.sprite:setAnchorPoint(cc.p(0.32,0.5))
+		self.sprite:setFlippedX(false)
+	else
+		self.sprite:setAnchorPoint(cc.p(0.68,0.5))
+		self.sprite:setFlippedX(true)
+	end
+end
+
+function BaseRole:ToDead()
+	if self.fsm:canDoEvent("stop") then
+		self.fsm:doEvent("stop")
+	end
+	self.fsm:doEvent("killed")
+end
+
+function BaseRole:onDead()
+	-- 死亡动作
+	local func = function()
+		transition.fadeTo(self.sprite, 
+							{opacity = 0, 
+							 time = 2, 
+							 onComplete = function() 
+							 				self.sprite:removeFromParent()
+							 				self:DeleteMe()
+							 				print("I'm Realy Dead !!!")
+							 			  end
+							}
+						 )
+	end
+	self:PlayAnimationOnce("dead",func)
 end
 
 function BaseRole:GetSkillConfig(skill_id)

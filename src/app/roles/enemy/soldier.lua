@@ -11,8 +11,9 @@ Soldier.__default_arg = {
 	sprite_name = "#soldier-walk-1.png",
 
 	pos_offset = {
-		x = 0,
-		y = -8,
+		x = 43,
+		regular_y = -8,
+		regular_x = 0,
 	},
 
 	patrol_range = {

@@ -10,8 +10,9 @@ Fighter = Fighter or BaseClass(BaseRole)
 Fighter.__default_arg = {
 	sprite_name = "#fighter-walk-1.png",
 	pos_offset = {
-		x = 83,
-		y = 0,
+		x = 40,
+		regular_y = 0,
+		regular_x = 0,
 	},
 }
 
@@ -46,7 +47,9 @@ function Fighter:onTouch()
 	if not DataProcess.Instance:JudgeifSkillCd(self:GetRoleId(),100) then
 		return
 	end
-	self.fsm:doEvent("attack")
+	if self.fsm:canDoEvent("attack") then
+		self.fsm:doEvent("attack")
+	end
 end
 
 function Fighter:DoMoveEvent()
@@ -95,4 +98,12 @@ function Fighter:Stop()
 	if not self.fsm:isState("idle") then
 		self.fsm:doEvent("stop")
 	end
+end
+
+function BaseRole:ToDead()
+	StickUnits.Instance:RemoveFromScene()
+	if self.fsm:canDoEvent("stop") then
+		self.fsm:doEvent("stop")
+	end
+	self.fsm:doEvent("killed")
 end
