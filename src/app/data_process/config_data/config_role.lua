@@ -34,7 +34,7 @@ config_role = {
 
 	[100] = {
 		name = "格斗家",
-		base_hp = 800,
+		base_hp = 100,
 		grow_hp = 100,
 		base_damage = 90,
 		graw_damage = 10,

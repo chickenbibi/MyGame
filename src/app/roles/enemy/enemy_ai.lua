@@ -176,6 +176,7 @@ function EnemyAI:MoveToAround(range)
 	local player = SceneManager.Instance:GetRoleById(SceneManager.Instance:GetPlayerRoleId())
 	if not player then
 	    self:StopAI()
+	    return
 	end
 	local pos = player:GetPosition()
 	local vertical = math.random(-10000,10000)
@@ -210,6 +211,7 @@ function EnemyAI:MoveToFront(range)
 	local player = SceneManager.Instance:GetRoleById(SceneManager.Instance:GetPlayerRoleId())
 	if not player then
 	    self:StopAI()
+	    return
 	end
 	local pos = player:GetPosition()
 	local offsetX = math.random(range.x,range.x + 100)
@@ -234,6 +236,7 @@ function EnemyAI:MoveToBack(range)
 	local player = SceneManager.Instance:GetRoleById(SceneManager.Instance:GetPlayerRoleId())
 	if not player then
 	    self:StopAI()
+	    return
 	end
 	local pos = player:GetPosition()
 	local offsetX = math.random(range.x,range.x+100)
@@ -258,6 +261,7 @@ function EnemyAI:FollowPlayer(range)
 	local player = SceneManager.Instance:GetRoleById(SceneManager.Instance:GetPlayerRoleId())
 	if not player then
 	    self:StopAI()
+	    return
 	end
 	local pos = player:GetPosition()
 	local vertical = self:GetPosition().y - pos.y
@@ -285,6 +289,7 @@ function EnemyAI:AttackRange(skill_id)
 	local player = SceneManager.Instance:GetRoleById(SceneManager.Instance:GetPlayerRoleId())
 	if not player then
 	    self:StopAI()
+	    return
 	end
 	local player_pos = player:GetPosition()
 	local ret = DataProcess.Instance:GetRoleInRange(
@@ -336,9 +341,6 @@ function EnemyAI:RandomSeed()
 end
 
 function EnemyAI:StopAI()
-	if self.fsm:canDoEvent("stop") then
-		self.fsm:doEvent("stop")
-	end
 	local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
 	for k,v in pairs(self.handle) do
 		if v then
@@ -346,7 +348,9 @@ function EnemyAI:StopAI()
 			v = nil
 		end
 	end
-
+	if self.fsm:canDoEvent("stop") then
+		self.fsm:doEvent("stop")
+	end
 end
 
 function EnemyAI:onHitted()

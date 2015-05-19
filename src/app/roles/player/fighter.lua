@@ -22,11 +22,6 @@ function Fighter:__init(attr)
 	self:SetupStateMachine()
 end
 
-function Fighter:ChangeHp()
-	-- HP改变事件，需要的时候开启
-	-- self:dispatchEvent({name = SCENE_EVENT.HP_CHANGED_EVENT})
-end
-
 function Fighter:AddAnimation()
 	-- 创建动作帧
     local animationNames = {"walk","attack1","attack2","hit","dead"}
@@ -59,24 +54,6 @@ function Fighter:DoMoveEvent()
 	self.fsm:doEvent("walk")
 end
 
--- function Fighter:onbeforeAttack()
--- 	-- 当前攻击模式，1、2为轻击，3为重击
--- 	self.attack_pattrn = (self.attack_pattrn + 1) % 3 + 1
--- 	local attack_pattrn = 2
--- 	if self.attack_pattrn == 3 then
--- 	    attack_pattrn = 1
--- 	end
--- 	transition.playAnimationOnce(self.sprite, 
--- 								 display.getAnimationCache("fighter-attack"..attack_pattrn),
--- 								 nil,
--- 								 function() self:AttackCallBack() end)
--- end
-
--- function Fighter:AttackCallBack()
--- 	DataProcess.Instance:CastSkill(self:GetRoleId(),100)
--- 	self:Stop()
--- end
-
 function Fighter:onAttacking()
 	local func = function()
 		DataProcess.Instance:CastSkill(self:GetRoleId(),100)
@@ -100,7 +77,7 @@ function Fighter:Stop()
 	end
 end
 
-function BaseRole:ToDead()
+function Fighter:ToDead()
 	StickUnits.Instance:RemoveFromScene()
 	if self.fsm:canDoEvent("stop") then
 		self.fsm:doEvent("stop")

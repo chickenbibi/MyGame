@@ -136,6 +136,9 @@ function SceneManager:SetRolePosition(role_id,pos)
 	if role then
 	    role:MoveToPosition(pos)
 	end
+	if role_id and role_id == self:GetPlayerRoleId() then
+		self:MoveDirctor()
+	end
 end
 
 function SceneManager:TurnRoleAround(role_id,role_info)
@@ -147,4 +150,8 @@ function SceneManager:TurnRoleAround(role_id,role_info)
 	table.insert(target,role_info)
 	self:UpdateRoleAttr(target)
 	role:TurnAround()
+end
+
+function SceneManager:MoveDirctor()
+	
 end

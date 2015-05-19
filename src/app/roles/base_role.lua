@@ -183,6 +183,7 @@ function BaseRole:TurnAround()
 end
 
 function BaseRole:ToDead()
+	printf("BaseRole:Role_%d is Dead !!!",self:GetRoleId())
 	if self.fsm:canDoEvent("stop") then
 		self.fsm:doEvent("stop")
 	end
