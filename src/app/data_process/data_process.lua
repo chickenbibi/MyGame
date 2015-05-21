@@ -22,16 +22,16 @@ function DataProcess:ResetData()
 	self.data_id = 0
 end
 
-function DataProcess:AddPlayer(role_id,pos)
+function DataProcess:AddPlayer(role_type,pos)
 	self.data_id = self.data_id + 1
-	local player_data = RoleData.New(role_id,pos,self.data_id)
+	local player_data = RoleData.New(role_type,pos,self.data_id)
 	table.insert(self.role_data_table,player_data)
 	return player_data:GetAttr()
 end
 
-function DataProcess:AddEnemy(role_id,pos)
+function DataProcess:AddEnemy(role_type,pos)
 	self.data_id = self.data_id + 1
-	local enemy_data = RoleData.New(role_id,pos,self.data_id)
+	local enemy_data = RoleData.New(role_type,pos,self.data_id)
 	table.insert(self.role_data_table,enemy_data)
 	return enemy_data:GetAttr()
 end

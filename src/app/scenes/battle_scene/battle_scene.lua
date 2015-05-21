@@ -53,8 +53,8 @@ function BattleScene:ResetRoleTable()
 	self.role_table = {}
 end
 
-function BattleScene:AddPlayer(role_id,pos)
-	local player_attr = DataProcess.Instance:AddPlayer(role_id,pos)
+function BattleScene:AddPlayer(role_type,pos)
+	local player_attr = DataProcess.Instance:AddPlayer(role_type,pos)
 	if player_attr then
 	    self.player = Fighter.New(player_attr)
 	    self.player:AddToScene(self,self.player)
@@ -63,8 +63,8 @@ function BattleScene:AddPlayer(role_id,pos)
 	end
 end
 
-function BattleScene:AddEnemy(role_id, pos)
-	local enemy_attr = DataProcess.Instance:AddEnemy(role_id,pos)
+function BattleScene:AddEnemy(role_type, pos)
+	local enemy_attr = DataProcess.Instance:AddEnemy(role_type,pos)
 	if enemy_attr then
 	    enemy = Soldier.New(enemy_attr)
 	    enemy:AddToScene(self,enemy)

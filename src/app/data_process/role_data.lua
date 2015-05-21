@@ -7,9 +7,9 @@ Email:			287429173@qq.com
 ]]
 RoleData = RoleData or BaseClass()
 
-function RoleData:__init(role_id,pos,index)
+function RoleData:__init(role_type,pos,index)
 	self:ResetData(pos,index)
-	self:LoadConfigData(role_id)
+	self:LoadConfigData(role_type)
 end
 
 function RoleData:ResetData(pos,index)
@@ -28,12 +28,12 @@ function RoleData:ResetData(pos,index)
 	self.attr.role_id = index
 end
 
-function RoleData:LoadConfigData(role_id)
-	if not role_id or not config_role[role_id] then
+function RoleData:LoadConfigData(role_type)
+	if not role_type or not config_role[role_type] then
 		error("Don't Have This Config Of Role !!!")
 		return
 	end
-	for key, value in pairs(config_role[role_id]) do
+	for key, value in pairs(config_role[role_type]) do
 		self.attr[key] = value
 	end
 	self.attr.hp = self.attr.base_hp + self.attr.grow_hp * self.attr.level

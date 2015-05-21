@@ -21,6 +21,7 @@ role_type 		角色类型
 PLAYER_ROLE = 1
 ENEMY_ROLE = 2
 
+
 config_role = {
 	[1] = {
 		name = "基础角色",
