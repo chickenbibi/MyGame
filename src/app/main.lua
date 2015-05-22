@@ -37,7 +37,7 @@ function main:run()
 	DataProcess.New()
 	SceneManager.New()
 
-    display.replaceScene(GameStartScene.Instance)
+    display.replaceScene(GameStartScene.Instance:GetScene())
 end
 
 function main:ResetData()

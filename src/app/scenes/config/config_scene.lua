@@ -6,7 +6,13 @@ Author: 		Luoheng
 Email:			287429173@qq.com
 ]]
 config_scene = {
-	["battle_scene"] = {
+	["GameStartScene"] = {
+		start_pos = {
+			x = 0,
+			y = 0,
+		},
+	},
+	["BattleScene"] = {
 		start_pos = {
 			x = 0,
 			y = 0,

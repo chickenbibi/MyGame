@@ -1,29 +1,31 @@
 --[[
 Copyright:		2015, Luoheng. All rights reserved.
-File name: 		game_start_scene
-Description: 	游戏开始场景
+File name: 		game_start
+Description: 	开始场景
 Author: 		Luoheng
 Email:			287429173@qq.com
 ]]
-GameStartScene = GameStartScene or class("GameStartScene", function()
-    return display.newScene("GameStartScene")
-end)
 
-function GameStartScene:ctor()
+GameStartScene = GameStartScene or BaseClass(BaseScene)
+
+function GameStartScene:__init()
 	if GameStartScene.Instance ~= nil then
 	    error("GameStartScene must be singleton!")
 	end
 	GameStartScene.Instance = self
 	cc.FileUtils:getInstance():addSearchPath("res/scenes/game_start/")
-	cc.uiloader:load("game_start.json"):addTo(self)
-
+	cc.uiloader:load("game_start.json"):addTo(self:GetScene())
 	self:LoadJsonCallBack()
+	self:InitEvents()
+	self:SetNextScene(BattleScene.Instance)
+end
+
+function GameStartScene:LoadSceneConfig()
+	self.scene_config = self:GetSceneConfig("GameStartScene")
 end
 
 function GameStartScene:LoadJsonCallBack()
-	self.btn_start = cc.uiloader:seekNodeByName(self, "btn_start")
-
-	self:InitEvents()
+	self.btn_start = cc.uiloader:seekNodeByName(self:GetScene(), "btn_start")
 end
 
 function GameStartScene:InitEvents()
@@ -37,9 +39,4 @@ function GameStartScene:InitEvents()
 		:onButtonClicked(function(event)
 			self:EnterNextScene()
 		end)
-end
-
-function GameStartScene:EnterNextScene()
-    SceneManager.Instance:EnterScene(BattleScene.Instance)
-    SceneManager.Instance:DeleteSceneFromMgr(GameStartScene.Instance)
 end

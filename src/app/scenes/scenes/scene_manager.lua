@@ -18,40 +18,14 @@ function SceneManager:__init()
 	StickUnits.New()
 
 	-- 场景初始化
-	GameStartScene.new()
-	BattleScene.new()
-
-	self:AddSceneToMgr(GameStartScene.Instance)
-	self:AddSceneToMgr(BattleScene.Instance)
-end
-
-function SceneManager:AddSceneToMgr(scene)
-	if not scene or not self.scene_table then
-	    return
-	end
-	scene:retain()
-	table.insert(self.scene_table,scene)
-	return true
-end
-
-function SceneManager:DeleteSceneFromMgr(scene)
-	if not scene or not self.scene_table or #self.scene_table == 0 then
-	    printError("Scene [%d] Delete Fail !!!",index)
-	    return
-	end
-	for index = 1 , #self.scene_table do
-		if self.scene_table[index] == scene then
-		    table.remove(self.scene_table,index)
-		    scene:release()
-		    return true
-		end
-	end
+	BattleScene.New()
+	GameStartScene.New()
 end
 
 function SceneManager:ResetData()
 	if not self.scene_table or #self.scene_table == 0 then
 		self.scene_table = {}
-		self.cur_scene = nil
+		self.cur_scene_mgr = nil
 	    return
 	end
 	for index = 1 , #self.scene_table do
@@ -60,19 +34,19 @@ function SceneManager:ResetData()
 	return true
 end
 
-function SceneManager:EnterScene(scene)
-	self.cur_scene = scene
+function SceneManager:EnterScene(scene_mgr)
+	self.cur_scene_mgr = scene_mgr
 	StickUnits.Instance:RemoveFromScene()
-	StickUnits.Instance:AddToScene(scene:GetTouchLayer())
-	display.replaceScene(scene)
-	scene:StartEnemyAI()
+	StickUnits.Instance:AddToScene(scene_mgr:GetScene())
+	display.replaceScene(scene_mgr:GetScene())
+	scene_mgr:StartEnemyAI()
 end
 
 function SceneManager:UpdateRoleAttr(target)
 	if not target then
 		return
 	end
-	local scene_role_table = self.cur_scene:GetRoleTable()
+	local scene_role_table = self.cur_scene_mgr:GetRoleTable()
 	local target_role_table = {}
 	for i = 1 , #target do
 		for j = 1 , #scene_role_table do
@@ -93,7 +67,7 @@ function SceneManager:NoticeDead(role)
 	local dead_role = self:GetRoleById(role:GetRoleId())
 	if dead_role then
 		dead_role:ToDead()
-		self.cur_scene:RemoveRoleFromTable(dead_role)
+		self.cur_scene_mgr:RemoveRoleFromTable(dead_role)
 	end
 end
 
@@ -101,7 +75,7 @@ function SceneManager:GetRoleById(role_id)
 	if not role_id then
 	    return
 	end
-	local scene_role_table = self.cur_scene:GetRoleTable()
+	local scene_role_table = self.cur_scene_mgr:GetRoleTable()
 	for j = 1 , #scene_role_table do
 		if scene_role_table[j]:GetRoleId() == role_id then
 			return scene_role_table[j]

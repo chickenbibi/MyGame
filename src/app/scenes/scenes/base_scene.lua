@@ -1,25 +1,25 @@
 --[[
 Copyright:		2015, Luoheng. All rights reserved.
-File name: 		fighter
-Description: 	角色行为基类
+File name: 		base_scene
+Description: 	场景管理器基类
 Author: 		Luoheng
 Email:			287429173@qq.com
 ]]
 BaseScene = BaseScene or BaseClass()
 
-function BaseScene:__init(scene_id)
-	local scene_config = self:GetSceneConfig(scene_id)
-	if not scene_config then
-	    error("Doesn't Exsit the Scene config")
-	end
-
-	self.scene = display.newScene(tostring(scene_id))
+function BaseScene:__init()
+	self.scene = display.newScene(tostring(self))
 	self.scene:retain()
-
 	self:ResetRoleTable()
-	if self.loadJsonCallBack then
-	    self:loadJsonCallBack()
-	end
+	self:LoadSceneConfig()
+end
+
+function BaseScene:LoadSceneConfig()
+    error("Doesn't Exsit the Method:[LoadSceneConfig] !!")
+end
+
+function BaseScene:__delete()
+	self.scene:release()
 end
 
 function BaseScene:GetScene()
@@ -59,11 +59,11 @@ function BaseScene:GetSceneConfig(scene_id)
 end
 
 function BaseScene:AddPlayer(role_type,pos)
-	if role_type == FighterType then
+	if role_type == RoleType.Fighter then
 		local player_attr = DataProcess.Instance:AddPlayer(role_type,pos)
 		if player_attr then
 		    self.player = Fighter.New(player_attr)
-		    self.player:AddToScene(self,self.player)
+		    self.player:AddToScene(self:GetScene(),self.player)
 		    self:AddRoleToTable(self.player)
 		    SceneManager.Instance:SetPlayerRoleId(self.player:GetRoleId())
 		end
@@ -71,14 +71,22 @@ function BaseScene:AddPlayer(role_type,pos)
 end
 
 function BaseScene:AddEnemy(role_type, pos)
-	if role_type == SoldierType then
+	if role_type == RoleType.Soldier then
 	    local enemy_attr = DataProcess.Instance:AddEnemy(role_type,pos)
 	    if enemy_attr then
 	        enemy = Soldier.New(enemy_attr)
-	        enemy:AddToScene(self,enemy)
+	        enemy:AddToScene(self:GetScene(),enemy)
 	        self:AddRoleToTable(enemy)
 	    end
 	end
+end
+
+function BaseScene:AddStick()
+	
+end
+
+function BaseScene:AddQuickSkill()
+	
 end
 
 function BaseScene:StartEnemyAI()
@@ -92,10 +100,10 @@ function BaseScene:StartEnemyAI()
 	end
 end
 
-function BaseScene:SetNextScene(scene)
-	self.next_scene = scene
+function BaseScene:SetNextScene(scene_mgr)
+	self.next_scene_mgr = scene_mgr
 end
 
 function BaseScene:EnterNextScene()
-	SceneManager.Instance:EnterScene(self.next_scene)
+	SceneManager.Instance:EnterScene(self.next_scene_mgr)
 end

@@ -30,7 +30,7 @@ end
 
 function RoleData:LoadConfigData(role_type)
 	if not role_type or not config_role[role_type] then
-		error("Don't Have This Config Of Role !!!")
+		error("Don't Have This Config Of Role:",role_type)
 		return
 	end
 	for key, value in pairs(config_role[role_type]) do

@@ -5,7 +5,8 @@ Description: 	角色名称定义
 Author: 		Luoheng
 Email:			287429173@qq.com
 ]]
+RoleType = RoleType or {}
 
-FighterType = 100
+RoleType.Fighter = 100
 
-SoldierType = 1000
+RoleType.Soldier = 1000
