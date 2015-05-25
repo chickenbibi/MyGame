@@ -17,6 +17,9 @@ function SceneManager:__init()
 	-- 摇杆初始化
 	StickUnits.New()
 
+	-- 技能栏初始化
+	QuickSkill.New()
+
 	-- 场景初始化
 	BattleScene.New()
 	GameStartScene.New()
@@ -36,10 +39,10 @@ end
 
 function SceneManager:EnterScene(scene_mgr)
 	self.cur_scene_mgr = scene_mgr
-	StickUnits.Instance:RemoveFromScene()
-	StickUnits.Instance:AddToScene(scene_mgr:GetScene())
 	display.replaceScene(scene_mgr:GetScene())
 	scene_mgr:StartEnemyAI()
+	scene_mgr:AddStick()
+	scene_mgr:AddQuickSkill()
 end
 
 function SceneManager:UpdateRoleAttr(target)

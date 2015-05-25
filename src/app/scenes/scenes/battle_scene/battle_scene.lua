@@ -44,10 +44,6 @@ end
 --     self:addChild(self.layerTouch)
 -- end
 
-function BattleScene:GetTouchLayer()
-	return self.layerTouch
-end
-
 function BattleScene:StartEnemyAI()
 	if not self.role_table then
 		return

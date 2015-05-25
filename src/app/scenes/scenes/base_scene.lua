@@ -82,11 +82,13 @@ function BaseScene:AddEnemy(role_type, pos)
 end
 
 function BaseScene:AddStick()
-	
+	StickUnits.Instance:RemoveFromScene()
+	StickUnits.Instance:AddToScene(self:GetScene())
 end
 
 function BaseScene:AddQuickSkill()
-	
+	QuickSkill.Instance:RemoveFromScene()
+	QuickSkill.Instance:AddToScene(self:GetScene())
 end
 
 function BaseScene:StartEnemyAI()

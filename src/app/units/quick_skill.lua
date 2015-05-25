@@ -5,14 +5,20 @@ function QuickSkill:__init()
 	    error("QuickSkill must be singleton!")
 	end
 	QuickSkill.Instance = self
-	self.skill = {}
 
+	self:ResetData()
 	self:InitSprite()
 	self:InitEvents()
 end
 
+function QuickSkill:ResetData()
+	self.skill = {}
+	self.handle = {}
+end
+
 function QuickSkill:InitSprite()
 	self.skill["base_skill"] = display.newSprite("res/units/quick_skill/base_skill.png", display.right - 120, display.bottom + 122)
+	self.skill["base_skill"]:setTouchEnabled(true)
 	self.skill["base_skill"]:setAnchorPoint(cc.p(0.5, 0.5))
 	self.skill["base_skill"]:retain()
 end
@@ -35,18 +41,18 @@ function QuickSkill:RegisterEvents()
 			event.target:setScale(1.0)
 		end)
 		:onButtonClicked(function(event)
-			self.handle[k]
+			self.handle[k]()
 		end)
 	end
 end
 
-function QuickSkill:AddToLayer(layer)
+function QuickSkill:AddToScene(layer)
 	for k,v in pairs(self.skill) do
 		layer:addChild(v)
 	end
 end
 
-function QuickSkill:RemoveFromLayer()
+function QuickSkill:RemoveFromScene()
 	for k,v in pairs(self.skill) do
 		if v:getParent() then
 			v:removeFromParent()
